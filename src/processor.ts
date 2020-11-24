@@ -4,13 +4,18 @@ import { dirname } from "path";
 
 export default class Processor {
     private libPath = "src/reduxUtils";
+    private libFile = "src/reduxUtils.ts";
+
+    public setLibPath(libPath: string, libFile: string): void {
+        this.libPath = libPath;
+        this.libFile = libFile;
+    }
 
     public async processFiles(entrypoints: string[]): Promise<void> {
-        const libPathFile = `${this.libPath}.ts`;
-        const existingLib = (await exists(libPathFile)) ? await readFile(libPathFile) : null;
+        const existingLib = (await exists(this.libFile)) ? await readFile(this.libFile) : null;
         const lib = genLibrary();
         if (existingLib !== lib) {
-            await writeFile(libPathFile, lib);
+            await writeFile(this.libFile, lib);
         }
 
         for (const entrypoint of entrypoints) {

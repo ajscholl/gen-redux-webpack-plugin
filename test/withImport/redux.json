@@ -1,0 +1,14 @@
+{
+    "__imports": {
+        "./hasDefault": "DefaultObject",
+        "./normal": "{ NormalObject, OtherObject }"
+    },
+    "publishDefault": {
+        "def": "DefaultObject",
+        "isDefault": "boolean"
+    },
+    "publishNormal": {
+        "object": "NormalObject",
+        "other": "OtherObject"
+    }
+}
