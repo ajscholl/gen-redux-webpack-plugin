@@ -1,6 +1,14 @@
-import { Redux, genActions, genLibrary } from "./generator";
+import * as yaml from "yaml";
+import { Imports, Redux, genActions, genLibrary } from "./generator";
 import { exists, readFile, readdir, stat, writeFile } from "./utils";
 import { dirname } from "path";
+
+interface ReduxFile {
+    imports?: {
+        actions?: Imports;
+    };
+    actions: Redux;
+}
 
 export default class Processor {
     private libPath = "src/reduxUtils";
@@ -30,10 +38,10 @@ export default class Processor {
         }
     }
 
-    private async loadRedux(path: string): Promise<Redux> {
+    private async loadRedux(path: string): Promise<ReduxFile> {
         const str = await readFile(path);
 
-        return JSON.parse(str);
+        return path.endsWith(".yml") ? yaml.parse(str) : JSON.parse(str);
     }
 
     private async processDir(dir: string): Promise<void> {
@@ -43,14 +51,14 @@ export default class Processor {
             const info = await stat(path);
             if (info.isDirectory()) {
                 await this.processDir(path);
-            } else if (info.isFile() && file === "redux.json") {
+            } else if (info.isFile() && (file === "redux.json" || file === "redux.yml")) {
                 const prefixParts = dir.split("/");
                 const prefix = prefixParts[prefixParts.length - 1] || "";
-                const { __imports, ...redux } = await this.loadRedux(path);
-                const actions = genActions(this.libPath, prefix, path, __imports || {}, redux);
+                const { imports, actions } = await this.loadRedux(path);
+                const actionsSrc = genActions(this.libPath, prefix, path, (imports && imports.actions) || {}, actions);
                 const existingActions = (await exists(`${dir}/actions.ts`)) ? await readFile(`${dir}/actions.ts`) : null;
-                if (existingActions !== actions) {
-                    await writeFile(`${dir}/actions.ts`, actions);
+                if (existingActions !== actionsSrc) {
+                    await writeFile(`${dir}/actions.ts`, actionsSrc);
                 }
             }
         }

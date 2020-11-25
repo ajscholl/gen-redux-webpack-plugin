@@ -1,0 +1,7 @@
+imports:
+  actions:
+    ../withImport/hasDefault: DefaultObject
+
+actions:
+  setDefault:
+    newDefault: DefaultObject
