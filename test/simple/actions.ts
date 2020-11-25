@@ -1,8 +1,7 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/simple/redux.json, edit that file instead.
 
-import { Action } from "redux";
-import { deepFreeze } from "../utils";
+import { Action, deepFreeze } from "../utils";
 
 export const SET_VALUE = "SIMPLE_SET_VALUE";
 export const CLEAR_VALUE = "SIMPLE_CLEAR_VALUE";

@@ -1,10 +1,9 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/withImport/redux.json, edit that file instead.
 
+import { Action, deepFreeze } from "../utils";
 import { NormalObject, OtherObject } from "./normal";
-import { Action } from "redux";
 import DefaultObject from "./hasDefault";
-import { deepFreeze } from "../utils";
 
 export const PUBLISH_DEFAULT = "WITH_IMPORT_PUBLISH_DEFAULT";
 export const PUBLISH_NORMAL = "WITH_IMPORT_PUBLISH_NORMAL";

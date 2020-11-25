@@ -1,9 +1,8 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/yaml/redux.yml, edit that file instead.
 
-import { Action } from "redux";
+import { Action, deepFreeze } from "../utils";
 import DefaultObject from "../withImport/hasDefault";
-import { deepFreeze } from "../utils";
 
 export const SET_DEFAULT = "YAML_SET_DEFAULT";
 

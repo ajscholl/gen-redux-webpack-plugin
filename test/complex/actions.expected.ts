@@ -1,8 +1,7 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/complex/redux.json, edit that file instead.
 
-import { Action } from "redux";
-import { deepFreeze } from "../utils";
+import { Action, deepFreeze } from "../utils";
 
 export const SET_CALLBACK = "COMPLEX_SET_CALLBACK";
 export const SET_MULTIPLE = "COMPLEX_SET_MULTIPLE";
