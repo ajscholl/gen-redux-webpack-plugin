@@ -6,6 +6,17 @@ export interface ReduxAction {
     [field: string]: string;
 }
 
+export interface State {
+    [field: string]: {
+        type: string;
+        default: string;
+    };
+}
+
+export interface Reducer {
+    [action: string]: "default" | ReduxAction;
+}
+
 export interface Imports {
     [file: string]: string;
 }
@@ -74,6 +85,27 @@ function compareString(a: string, b: string): -1 | 0 | 1 {
     return cleanA < cleanB ? -1 : cleanA > cleanB ? 1 : 0;
 }
 
+function compareImport(a: Import, b: Import): -1 | 0 | 1 {
+    const isMultipleA = a.values.split(/,/g).length > 1;
+    const isMultipleB = b.values.split(/,/g).length > 1;
+    if (isMultipleA && isMultipleB) {
+        if (a.values === b.values) {
+            return compareString(a.file, b.file);
+        }
+        return compareString(a.values, b.values);
+    }
+    if (isMultipleA) {
+        return -1;
+    }
+    if (isMultipleB) {
+        return 1;
+    }
+    if (a.values === b.values) {
+        return compareString(a.file, b.file);
+    }
+    return compareString(a.values, b.values);
+}
+
 export function genActions(libPath: string, prefix: string, path: string, imports: Imports, redux: Redux): string {
     const lines: string[] = [];
     lines.push("// DO NOT EDIT - AUTOMATICALLY GENERATED!");
@@ -87,26 +119,7 @@ export function genActions(libPath: string, prefix: string, path: string, import
             values: imports[importName],
         })),
     ];
-    importList.sort((a, b): -1 | 0 | 1 => {
-        const isMultipleA = a.values.split(/,/g).length > 1;
-        const isMultipleB = b.values.split(/,/g).length > 1;
-        if (isMultipleA && isMultipleB) {
-            if (a.values === b.values) {
-                return compareString(a.file, b.file);
-            }
-            return compareString(a.values, b.values);
-        }
-        if (isMultipleA) {
-            return -1;
-        }
-        if (isMultipleB) {
-            return 1;
-        }
-        if (a.values === b.values) {
-            return compareString(a.file, b.file);
-        }
-        return compareString(a.values, b.values);
-    });
+    importList.sort(compareImport);
     for (const { file, values } of importList) {
         lines.push(`import ${values} from ${JSON.stringify(file)};`);
     }
@@ -130,7 +143,7 @@ export function genActions(libPath: string, prefix: string, path: string, import
     }
 
     const actionTypes = reduxKeys.map((key) => `I${makeName(prefix, key)}Action`);
-    if (actionTypes.join(" | ").length < 200) {
+    if (actionTypes.join(" | ").length < 120) {
         lines.push(`export type ${makeName(prefix, "Actions")} = ${actionTypes.join(" | ")};`);
     } else {
         lines.push(`export type ${makeName(prefix, "Actions")} =`);
@@ -187,6 +200,67 @@ export function genActions(libPath: string, prefix: string, path: string, import
     lines.push("        }");
     lines.push("    };");
     lines.push("}");
+    lines.push("");
+
+    return lines.join("\n");
+}
+
+export function genReducer(prefix: string, path: string, imports: Imports, actions: Redux, state: State, reducer: Reducer): string {
+    const lines: string[] = [];
+    lines.push("// DO NOT EDIT - AUTOMATICALLY GENERATED!");
+    lines.push(`// This file is generated from ${path}, edit that file instead.`);
+    lines.push("");
+    const importList: Import[] = [
+        { file: "./actions", values: `{ gen${makeName(prefix, "Reducer")} }` },
+        ...Object.keys(imports).map((importName) => ({
+            file: importName,
+            values: imports[importName],
+        })),
+    ];
+    importList.sort(compareImport);
+    for (const { file, values } of importList) {
+        lines.push(`import ${values} from ${JSON.stringify(file)};`);
+    }
+    lines.push("");
+
+    lines.push(`export interface ${makeName(prefix, "State")} {`);
+    for (const field of Object.keys(state)) {
+        lines.push(`    ${field}: ${state[field].type};`);
+    }
+    lines.push("}");
+    lines.push("");
+
+    lines.push(`const initialState: ${makeName(prefix, "State")} = {`);
+    for (const field of Object.keys(state)) {
+        lines.push(`    ${field}: ${state[field].default},`);
+    }
+    lines.push("};");
+    lines.push("");
+
+    lines.push(`export const ${makeAction(prefix, "Reducer")} = gen${makeName(prefix, "Reducer")}(initialState, {`);
+    for (const action of Object.keys(actions)) {
+        const reducerConfig: "default" | ReduxAction | undefined = reducer[action];
+        if (reducerConfig === undefined) {
+            lines.push(`    ${makeAction(action)}: (state) => state,`);
+            continue;
+        }
+        if (reducerConfig === "default") {
+            lines.push(`    ${makeAction(action)}: (${mergeArgs("state", makeArgs(actions[action]))}) => ({`);
+            lines.push(`        ...state,`);
+            for (const stateKey of Object.keys(actions[action])) {
+                lines.push(`        ${stateKey},`);
+            }
+            lines.push(`    }),`);
+            continue;
+        }
+        lines.push(`    ${makeAction(action)}: (${mergeArgs("state", makeArgs(actions[action]))}) => ({`);
+        lines.push(`        ...state,`);
+        for (const stateKey of Object.keys(reducerConfig)) {
+            lines.push(`        ${stateKey}: ${reducerConfig[stateKey]},`);
+        }
+        lines.push(`    }),`);
+    }
+    lines.push("});");
     lines.push("");
 
     return lines.join("\n");

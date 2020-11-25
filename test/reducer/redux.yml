@@ -1,0 +1,39 @@
+imports:
+  reducer:
+    ./page-provider: "{ PageNumber }"
+  actions:
+    ./page-provider: "{ PageNumber }"
+
+actions:
+  setPage:
+    page: PageNumber
+  clearPage: {}
+  setFirstPage: {}
+  advancePage: {}
+  setOtherPage:
+    page: PageNumber
+  setBothPages:
+    page: PageNumber
+    otherPage: PageNumber
+  otherAction: 
+    field: number
+
+state:
+  page: 
+    type: PageNumber | null
+    default: "null"
+  otherPage: 
+    type: PageNumber
+    default: "0"
+
+reducer:
+  setPage: default
+  clearPage:
+    page: "null"
+  setFirstPage:
+    page: "1"
+  advancePage:
+    page: "(state.page || 0) + 1"
+  setOtherPage:
+    otherPage: page
+  setBothPages: default

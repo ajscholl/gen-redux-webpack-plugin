@@ -1,13 +1,16 @@
 import * as yaml from "yaml";
-import { Imports, Redux, genActions, genLibrary } from "./generator";
+import { Imports, Reducer, Redux, State, genActions, genLibrary, genReducer } from "./generator";
 import { exists, readFile, readdir, stat, writeFile } from "./utils";
 import { dirname } from "path";
 
 interface ReduxFile {
     imports?: {
         actions?: Imports;
+        reducer?: Imports;
     };
     actions: Redux;
+    state?: State;
+    reducer?: Reducer;
 }
 
 export default class Processor {
@@ -54,11 +57,18 @@ export default class Processor {
             } else if (info.isFile() && (file === "redux.json" || file === "redux.yml")) {
                 const prefixParts = dir.split("/");
                 const prefix = prefixParts[prefixParts.length - 1] || "";
-                const { imports, actions } = await this.loadRedux(path);
+                const { imports, actions, state, reducer } = await this.loadRedux(path);
                 const actionsSrc = genActions(this.libPath, prefix, path, (imports && imports.actions) || {}, actions);
                 const existingActions = (await exists(`${dir}/actions.ts`)) ? await readFile(`${dir}/actions.ts`) : null;
                 if (existingActions !== actionsSrc) {
                     await writeFile(`${dir}/actions.ts`, actionsSrc);
+                }
+                if (state !== undefined && reducer !== undefined) {
+                    const reducerSrc = genReducer(prefix, path, (imports && imports.reducer) || {}, actions, state, reducer);
+                    const existingReducer = (await exists(`${dir}/reducer.ts`)) ? await readFile(`${dir}/reducer.ts`) : null;
+                    if (existingReducer !== reducerSrc) {
+                        await writeFile(`${dir}/reducer.ts`, reducerSrc);
+                    }
                 }
             }
         }
