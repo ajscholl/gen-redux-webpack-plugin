@@ -14,8 +14,13 @@ interface ReduxFile {
 }
 
 export default class Processor {
-    private libPath = "src/reduxUtils";
-    private libFile = "src/reduxUtils.ts";
+    private libPath: string;
+    private libFile: string;
+
+    public constructor() {
+        this.libPath = "src/reduxUtils";
+        this.libFile = "src/reduxUtils.ts";
+    }
 
     public setLibPath(libPath: string, libFile: string): void {
         this.libPath = libPath;

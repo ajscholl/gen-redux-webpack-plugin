@@ -3,7 +3,7 @@ import { Processor } from "../src";
 import { cwd } from "process";
 import { relative } from "path";
 
-const tests = ["simple", "withImport", "complex", "yaml", "reducer"];
+const tests = ["simple", "withImport", "complex", "yaml", "reducer", "todoApp"];
 
 async function runTest(test: string): Promise<void> {
     const path = relative(cwd(), `${__dirname}/${test}`);

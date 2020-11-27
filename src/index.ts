@@ -1,4 +1,4 @@
-import GenReduxActionsPlugin from "./plugin";
+import GenReduxActionsPlugin, { GenReduxActionsPluginOptions } from "./plugin";
 import Processor from "./processor";
 
-export { GenReduxActionsPlugin, Processor };
+export { GenReduxActionsPlugin, GenReduxActionsPluginOptions, Processor };

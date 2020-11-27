@@ -142,7 +142,7 @@ export function genActions(libPath: string, prefix: string, path: string, import
     }
 
     const actionTypes = reduxKeys.map((key) => `I${makeName(prefix, key)}Action`);
-    if (actionTypes.join(" | ").length < 120) {
+    if (actionTypes.join(" | ").length < 140) {
         lines.push(`export type ${makeName(prefix, "Actions")} = ${actionTypes.join(" | ")};`);
     } else {
         lines.push(`export type ${makeName(prefix, "Actions")} =`);

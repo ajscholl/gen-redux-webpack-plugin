@@ -19,8 +19,22 @@ interface Compilation {
     };
 }
 
+export interface GenReduxActionsPluginOptions {
+    /** Path to import the gen-redux-actions-plugin library from */
+    libPath?: string;
+    /** Path to write the gen-redux-actions-plugin library to */
+    libFile?: string;
+}
+
 export default class GenReduxActionsPlugin {
-    private processor = new Processor();
+    private processor: Processor;
+
+    public constructor(options: GenReduxActionsPluginOptions = {}) {
+        this.processor = new Processor();
+        if (options.libPath) {
+            this.processor.setLibPath(options.libPath, options.libFile || `${options.libPath}.ts`);
+        }
+    }
 
     public apply(compiler: Compiler): void {
         compiler.hooks.afterEmit.tap("GenReduxActionsPlugin", async (compilation) => {

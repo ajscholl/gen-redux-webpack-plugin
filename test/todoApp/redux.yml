@@ -1,0 +1,35 @@
+
+imports:
+  actions:
+    ./types: "{ Todo }"
+  reducer:
+    ./types: "{ Todo }"
+    ./sort: sortTodos
+
+actions:
+  addTodo:
+    todo: Todo
+  addTwoTodos:
+    firstTodo: Todo
+    secondTodo: Todo
+  setTodos:
+    todos: Todo[]
+  removeTodo:
+    todo: Todo
+  clearTodos: {}
+
+state:
+  todos:
+    type: Todo[]
+    default: "[]"
+
+reducer:
+  addTodo:
+    todos: "sortTodos([...state.todos, todo])"
+  addTwoTodos:
+    todos: "sortTodos([...state.todos, firstTodo, secondTodo])"
+  setTodos: default
+  removeTodo:
+    todos: "state.todos.filter((elem) => elem.id !== todo.id)"
+  clearTodos:
+    todos: "[]"
