@@ -38,12 +38,12 @@ export default class GenReduxActionsPlugin {
 
     public apply(compiler: Compiler): void {
         compiler.hooks.afterEmit.tap("GenReduxActionsPlugin", async (compilation) => {
-            const entrypoints = compilation.options.entry;
+            const entryPoints = compilation.options.entry;
 
-            if (Array.isArray(entrypoints)) {
-                await this.processor.processFiles(entrypoints);
-            } else if (typeof entrypoints === "object" && entrypoints !== null) {
-                await this.processor.processFiles(Object.keys(entrypoints).map((key) => entrypoints[key]));
+            if (Array.isArray(entryPoints)) {
+                await this.processor.processFiles(entryPoints);
+            } else if (typeof entryPoints === "object" && entryPoints !== null) {
+                await this.processor.processFiles(Object.keys(entryPoints).map((key) => entryPoints[key]));
             }
         });
     }
