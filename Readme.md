@@ -1,6 +1,6 @@
 # gen-redux-webpack-plugin
 
-Generate typesafe redux actions and reducer from a simple JSON or YAML file specification.
+Generate type-safe redux actions and reducer from a simple JSON or YAML file specification.
 
 - 🔨 Integrated as webpack plugin into your build process
 - 🔧 Simple CLI tool to generate the actions if you are not using webpack
@@ -49,7 +49,7 @@ new GenReduxActionsPlugin({
 
 The plugin takes two optional options:
 
-- `libPath` specifies the path used to import additonal utility functions from.
+- `libPath` specifies the path used to import additional utility functions from.
   It defaults to `"src/reduxUtils"`.
 - `libFile` specifies the filepath to generate the utility functions in. It defaults
   to `` `${libPath}.ts` ``.
@@ -57,7 +57,15 @@ The plugin takes two optional options:
 ## Command line
 
 You can use `gen-redux` from the command line to generate redux actions by hand
-instead of using the webpack plugin. It accepts `--libPath PATH` as an argument.
+instead of using the webpack plugin. It accepts the following options:
+
+- `--libPath PATH`: Import the library files from this path. Also sets `--libFile`
+  if not specified.
+- `--libFile PATH`: Write the library files to this path. You also need to specify
+  `--libPath` to get the correct import location.
+- `--watch`: After processing the specified directories, continue watching them
+  for changes and reprocess them as changes occur.
+
 All other arguments are interpreted as dictionaries to process. Each dictionary is
 recursively searched for `redux.yml` and `redux.json` files which are then processed.
 
@@ -115,7 +123,7 @@ state:
 # code for each field we want to overwrite in the state or let the plugin generate
 # a reducer for us.
 reducer:
-  # We need to specify this action ourselfes. We have a variable "state" in scope
+  # We need to specify this action ourselves. We have a variable "state" in scope
   # with the old state of the reducer as well as each field of the action as
   # another variable.
   addTodo:
@@ -245,6 +253,6 @@ export function genTodoAppReducer<State>(initialState: State, callbacks: TodoApp
 The code begins by defining some constants to differentiate our actions, then defines
 the actions itself as well as constructor functions for them. At the bottom we also
 see `genTodoAppReducer` which allows you to define a reducer for your actions easily
-even if you are not generatiging `recuder.ts` (it is only generated when you specify
+even if you are not generating `reducer.ts` (it is only generated when you specify
 `state` and `reducer` in your specification). It expects an object with a reducer function
 for each action and returns a reducer for your actions.

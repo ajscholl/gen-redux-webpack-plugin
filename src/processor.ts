@@ -27,26 +27,30 @@ export default class Processor {
         this.libFile = libFile;
     }
 
-    public async processFiles(entrypoints: string[]): Promise<void> {
+    public setLibFile(libFile: string): void {
+        this.libFile = libFile;
+    }
+
+    public async processFiles(entryPoints: string[]): Promise<void> {
         const existingLib = (await exists(this.libFile)) ? await readFile(this.libFile) : null;
         const lib = genLibrary();
         if (existingLib !== lib) {
             await writeFile(this.libFile, lib);
         }
 
-        for (const entrypoint of entrypoints) {
-            if (entrypoint.indexOf("node_modules") !== -1) {
+        for (const entryPoint of entryPoints) {
+            if (entryPoint.indexOf("node_modules") !== -1) {
                 continue;
             }
             try {
-                await this.processDir(dirname(entrypoint));
+                await this.processDir(dirname(entryPoint));
             } catch (error) {
-                console.error("Failed to process directory:", entrypoint, error);
+                console.error("Failed to process directory:", entryPoint, error);
             }
         }
     }
 
-    private async loadRedux(path: string): Promise<ReduxFile> {
+    private async loadRedux(path: string): Promise<ReduxFile | undefined | null> {
         const str = await readFile(path);
 
         return path.endsWith(".yml") ? yaml.parse(str) : JSON.parse(str);
@@ -62,7 +66,14 @@ export default class Processor {
             } else if (info.isFile() && (file === "redux.json" || file === "redux.yml")) {
                 const prefixParts = dir.split("/");
                 const prefix = prefixParts[prefixParts.length - 1] || "";
-                const { imports, actions, state, reducer } = await this.loadRedux(path);
+                const spec = await this.loadRedux(path);
+                if (!spec) {
+                    continue;
+                }
+                const { imports, actions, state, reducer } = spec;
+                if (!actions) {
+                    continue;
+                }
                 const actionsSrc = genActions(this.libPath, prefix, path, (imports && imports.actions) || {}, actions);
                 const existingActions = (await exists(`${dir}/actions.ts`)) ? await readFile(`${dir}/actions.ts`) : null;
                 if (existingActions !== actionsSrc) {
