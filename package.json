@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "jest --watchAll --collectCoverage",
+    "test:ci": "jest --collectCoverage",
     "lint": "eslint '*/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "build": "tsc -p .",
@@ -47,5 +48,8 @@
   },
   "dependencies": {
     "yaml": "^1.10.0"
+  },
+  "engines": {
+    "node": "^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0"
   }
 }
