@@ -65,7 +65,7 @@ export default class Processor {
                 await this.processDir(path);
             } else if (info.isFile() && (file === "redux.json" || file === "redux.yml")) {
                 const prefixParts = dir.split("/");
-                const prefix = prefixParts[prefixParts.length - 1] || "";
+                const prefix = (prefixParts[prefixParts.length - 1] || "").replace(/[^\w]/g, "");
                 const spec = await this.loadRedux(path);
                 if (!spec) {
                     continue;
