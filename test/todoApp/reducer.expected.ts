@@ -14,23 +14,23 @@ const initialState: TodoAppState = {
 };
 
 export const todoAppReducer = genTodoAppReducer(initialState, {
-    addTodo: (state, todo: Todo) => ({
+    addTodo: (state: TodoAppState, todo: Todo): TodoAppState => ({
         ...state,
         todos: sortTodos([...state.todos, todo]),
     }),
-    addTwoTodos: (state, firstTodo: Todo, secondTodo: Todo) => ({
+    addTwoTodos: (state: TodoAppState, firstTodo: Todo, secondTodo: Todo): TodoAppState => ({
         ...state,
         todos: sortTodos([...state.todos, firstTodo, secondTodo]),
     }),
-    setTodos: (state, todos: Todo[]) => ({
+    setTodos: (state: TodoAppState, todos: Todo[]): TodoAppState => ({
         ...state,
         todos,
     }),
-    removeTodo: (state, todo: Todo) => ({
+    removeTodo: (state: TodoAppState, todo: Todo): TodoAppState => ({
         ...state,
         todos: state.todos.filter((elem) => elem.id !== todo.id),
     }),
-    clearTodos: (state) => ({
+    clearTodos: (state: TodoAppState): TodoAppState => ({
         ...state,
         todos: [],
     }),

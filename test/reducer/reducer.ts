@@ -15,30 +15,30 @@ const initialState: ReducerState = {
 };
 
 export const reducerReducer = genReducerReducer(initialState, {
-    setPage: (state, page: PageNumber) => ({
+    setPage: (state: ReducerState, page: PageNumber): ReducerState => ({
         ...state,
         page,
     }),
-    clearPage: (state) => ({
+    clearPage: (state: ReducerState): ReducerState => ({
         ...state,
         page: null,
     }),
-    setFirstPage: (state) => ({
+    setFirstPage: (state: ReducerState): ReducerState => ({
         ...state,
         page: 1,
     }),
-    advancePage: (state) => ({
+    advancePage: (state: ReducerState): ReducerState => ({
         ...state,
         page: (state.page || 0) + 1,
     }),
-    setOtherPage: (state, page: PageNumber) => ({
+    setOtherPage: (state: ReducerState, page: PageNumber): ReducerState => ({
         ...state,
         otherPage: page,
     }),
-    setBothPages: (state, page: PageNumber, otherPage: PageNumber) => ({
+    setBothPages: (state: ReducerState, page: PageNumber, otherPage: PageNumber): ReducerState => ({
         ...state,
         page,
         otherPage,
     }),
-    otherAction: (state) => state,
+    otherAction: (state: ReducerState): ReducerState => state,
 });
