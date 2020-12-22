@@ -240,11 +240,11 @@ export function genReducer(prefix: string, path: string, imports: Imports, actio
     for (const action of Object.keys(actions)) {
         const reducerConfig: "default" | ReduxAction | undefined = reducer[action];
         if (reducerConfig === undefined) {
-            lines.push(`    ${makeAction(action)}: (state) => state,`);
+            lines.push(`    ${makeAction(action)}: (state: ${makeName(prefix, "State")}): ${makeName(prefix, "State")} => state,`);
             continue;
         }
         if (reducerConfig === "default") {
-            lines.push(`    ${makeAction(action)}: (${mergeArgs("state", makeArgs(actions[action]))}) => ({`);
+            lines.push(`    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(prefix, "State")} => ({`);
             lines.push(`        ...state,`);
             for (const stateKey of Object.keys(actions[action])) {
                 lines.push(`        ${stateKey},`);
@@ -252,7 +252,7 @@ export function genReducer(prefix: string, path: string, imports: Imports, actio
             lines.push(`    }),`);
             continue;
         }
-        lines.push(`    ${makeAction(action)}: (${mergeArgs("state", makeArgs(actions[action]))}) => ({`);
+        lines.push(`    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(prefix, "State")} => ({`);
         lines.push(`        ...state,`);
         for (const stateKey of Object.keys(reducerConfig)) {
             lines.push(`        ${stateKey}: ${reducerConfig[stateKey]},`);
