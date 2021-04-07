@@ -1,6 +1,6 @@
 {
   "name": "gen-redux-webpack-plugin",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Webpack plugin to generate redux actions and reducers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,7 +41,7 @@
     "@typescript-eslint/parser": "^4.11.0",
     "babel-jest": "^26.6.3",
     "eslint": "^7.16.0",
-    "eslint-config-prettier": "^7.1.0",
+    "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
