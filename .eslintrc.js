@@ -24,5 +24,6 @@ module.exports = {
                 allowSeparatedGroups: false,
             },
         ],
+        "linebreak-style": ["error", "unix"],
     },
 };
