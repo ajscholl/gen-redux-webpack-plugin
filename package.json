@@ -1,6 +1,6 @@
 {
   "name": "gen-redux-webpack-plugin",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Webpack plugin to generate redux actions and reducers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,23 +32,23 @@
   "author": "Anselm Jonas Scholl",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.14.3",
-    "@babel/preset-env": "^7.14.4",
-    "@babel/preset-typescript": "^7.13.0",
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.6.1",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
+    "@types/node": "^15.12.2",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
     "babel-jest": "^27.0.2",
-    "eslint": "^7.27.0",
+    "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
-    "jest": "^27.0.3",
-    "prettier": "^2.3.0",
+    "jest": "^27.0.4",
+    "prettier": "^2.3.1",
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "chokidar": "^3.5.1",
+    "chokidar": "^3.5.2",
     "yaml": "^1.10.2"
   },
   "engines": {
