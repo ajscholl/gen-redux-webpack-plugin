@@ -1,8 +1,18 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/reducer/redux.yml, edit that file instead.
 
+import {
+    genReducerReducer,
+    reducerAdvancePageAction,
+    reducerClearPageAction,
+    reducerOtherActionAction,
+    reducerSetBothPagesAction,
+    reducerSetFirstPageAction,
+    reducerSetOtherPageAction,
+    reducerSetPageAction,
+} from "./actions";
+import { Dispatch } from "../utils";
 import { PageNumber } from "./page-provider";
-import { genReducerReducer } from "./actions";
 
 export interface ReducerState {
     page: PageNumber | null;
@@ -42,3 +52,37 @@ export const reducerReducer = genReducerReducer(initialState, {
     }),
     otherAction: (state: ReducerState): ReducerState => state,
 });
+
+export interface ReducerStateProps {
+    page: PageNumber | null;
+    otherPage: PageNumber;
+}
+
+export function mapStateToProps(state: ReducerState): ReducerStateProps {
+    return {
+        page: state.page,
+        otherPage: state.otherPage,
+    };
+}
+
+export interface ReducerDispatchProps {
+    setPage(page: PageNumber): void;
+    clearPage(): void;
+    setFirstPage(): void;
+    advancePage(): void;
+    setOtherPage(page: PageNumber): void;
+    setBothPages(page: PageNumber, otherPage: PageNumber): void;
+    otherAction(field: number): void;
+}
+
+export function mapDispatchToProps(dispatch: Dispatch): ReducerDispatchProps {
+    return {
+        setPage: (page: PageNumber): void => dispatch(reducerSetPageAction(page)),
+        clearPage: (): void => dispatch(reducerClearPageAction()),
+        setFirstPage: (): void => dispatch(reducerSetFirstPageAction()),
+        advancePage: (): void => dispatch(reducerAdvancePageAction()),
+        setOtherPage: (page: PageNumber): void => dispatch(reducerSetOtherPageAction(page)),
+        setBothPages: (page: PageNumber, otherPage: PageNumber): void => dispatch(reducerSetBothPagesAction(page, otherPage)),
+        otherAction: (field: number): void => dispatch(reducerOtherActionAction(field)),
+    };
+}

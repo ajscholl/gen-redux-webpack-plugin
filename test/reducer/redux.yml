@@ -15,14 +15,14 @@ actions:
   setBothPages:
     page: PageNumber
     otherPage: PageNumber
-  otherAction: 
+  otherAction:
     field: number
 
 state:
-  page: 
+  page:
     type: PageNumber | null
     default: "null"
-  otherPage: 
+  otherPage:
     type: PageNumber
     default: "0"
 
@@ -37,3 +37,7 @@ reducer:
   setOtherPage:
     otherPage: page
   setBothPages: default
+
+options:
+  react:
+    enabled: false

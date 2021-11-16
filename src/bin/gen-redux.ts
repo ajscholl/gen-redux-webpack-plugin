@@ -27,16 +27,22 @@ async function main(): Promise<void> {
         switch (args[i]) {
             case "--help":
                 console.error("Usage:");
-                console.error("    gen-redux [--libPath PATH] [--libFile PATH] [--watch] [FOLDERS...]");
+                console.error(
+                    "    gen-redux [--libPath PATH] [--libFile PATH] [--react] [--reactModule MODULE] [--reactReduxModule MODULE] [--maxLineLength LENGTH] [--watch] [FOLDERS...]"
+                );
                 console.error("    gen-redux --init [FOLDERS...]");
                 console.error("");
                 console.error("Options:");
-                console.error("    --help         Show this help");
-                console.error("    --libPath      Specify the location to import the library files for actions and the reducer from");
-                console.error("    --libFile      Specify the location to store the library files for actions and the reducer");
-                console.error("    --watch        Continue watching for changes after processing and reprocess files as needed");
-                console.error("    --init         Create a stub redux.yml in the current directory or each passed directory");
-                console.error("    --version      Print version information");
+                console.error("    --help               Show this help");
+                console.error("    --libPath            Specify the location to import the library files for actions and the reducer from");
+                console.error("    --libFile            Specify the location to store the library files for actions and the reducer");
+                console.error("    --react              Generate methods connecting a component with a reducer");
+                console.error("    --reactModule        Specify the import for react");
+                console.error("    --reactReduxModule   Specify the import for react-redux");
+                console.error("    --maxLineLength      Set the maximum line length of the generated code");
+                console.error("    --watch              Continue watching for changes after processing and reprocess files as needed");
+                console.error("    --init               Create a stub redux.yml in the current directory or each passed directory");
+                console.error("    --version            Print version information");
                 console.error("");
                 console.error("gen-redux searches each folder you specify recursively for redux.json and redux.yml files");
                 console.error("and generates redux actions and reducers as specified.");
@@ -54,6 +60,30 @@ async function main(): Promise<void> {
                 libFile = args[i];
                 if (libFile !== undefined) {
                     processor.setLibFile(libFile);
+                }
+                break;
+            case "--react":
+                processor.setReactEnabled(true);
+                break;
+            case "--reactModule":
+                i++;
+                const reactModule = args[i];
+                if (reactModule) {
+                    processor.setReactModule(reactModule);
+                }
+                break;
+            case "--reactReduxModule":
+                i++;
+                const reactReduxModule = args[i];
+                if (reactReduxModule) {
+                    processor.setReactReduxModule(reactReduxModule);
+                }
+                break;
+            case "--maxLineLength":
+                i++;
+                const maxLineLength = Number.parseInt(args[i] || "", 10);
+                if (!Number.isNaN(maxLineLength)) {
+                    processor.setMaxLineLength(maxLineLength);
                 }
                 break;
             case "--watch":

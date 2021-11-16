@@ -37,7 +37,11 @@ export interface SimpleReducerCallbacks<State> {
     clearValue: (state: Readonly<State>) => State;
 }
 
-export function genSimpleReducer<State>(initialState: State, callbacks: SimpleReducerCallbacks<State>, freeze: (state: State) => State = deepFreeze): SimpleReducer<State> {
+export function genSimpleReducer<State>(
+    initialState: State,
+    callbacks: SimpleReducerCallbacks<State>,
+    freeze: (state: State) => State = deepFreeze
+): SimpleReducer<State> {
     return (state: Readonly<State> = initialState, action: Readonly<SimpleActions>): State => {
         let freezeFunc = freeze;
         if (process.env.DEVELOPMENT === "true") {

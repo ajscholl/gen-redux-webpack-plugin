@@ -5,6 +5,8 @@ export interface Action<T> {
     type: T;
 }
 
+export type Dispatch<T = unknown> = (action: Action<T>) => void;
+
 const objPrototype = Object.getPrototypeOf({});
 
 export function deepFreeze<S>(obj: S): S {

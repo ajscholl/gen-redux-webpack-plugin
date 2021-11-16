@@ -10,6 +10,7 @@ export interface State {
     [field: string]: {
         type: string;
         default: string;
+        internal?: boolean;
     };
 }
 
@@ -18,7 +19,7 @@ export interface Reducer {
 }
 
 export interface Imports {
-    [file: string]: string;
+    [file: string]: string | string[];
 }
 
 function getWords(camelCase: string): string[] {
@@ -58,10 +59,15 @@ function makeAction(...parts: string[]): string {
     return name.slice(0, 1).toLowerCase() + name.slice(1);
 }
 
-function makeArgs(redux: ReduxAction): string {
+function makeArgs(redux: ReduxAction, separator = ", "): string {
     return Object.keys(redux)
         .map((key) => `${key}: ${redux[key]}`)
-        .join(", ");
+        .join(separator);
+}
+
+function makeUnlinedArgs(redux: ReduxAction, indent: number): string {
+    const indentString = "".padStart(indent);
+    return "\n" + indentString + makeArgs(redux, ",\n" + indentString) + "\n" + "".padStart(indent - 4);
 }
 
 function makePassArgs(action: string, redux: ReduxAction): string {
@@ -76,7 +82,33 @@ function mergeArgs(...args: string[]): string {
 
 interface Import {
     file: string;
-    values: string;
+    values: string | string[];
+}
+
+function printImports(maxLineLength: number, importList: Import[]): string[] {
+    for (const { values } of importList) {
+        if (Array.isArray(values)) {
+            values.sort();
+        }
+    }
+    importList.sort(compareImport);
+
+    const result: string[] = [];
+    for (const { file, values } of importList) {
+        let importValues: string;
+        if (Array.isArray(values)) {
+            importValues = `{ ${values.join(", ")} }`;
+            const resultLine = `import ${importValues} from ${JSON.stringify(file)};`;
+            if (resultLine.length > maxLineLength) {
+                importValues = ["{", ...values.map((value) => `    ${value},`), "}"].join("\n");
+            }
+        } else {
+            importValues = values;
+        }
+        result.push(`import ${importValues} from ${JSON.stringify(file)};`);
+    }
+
+    return result;
 }
 
 function compareString(a: string, b: string): -1 | 0 | 1 {
@@ -85,14 +117,20 @@ function compareString(a: string, b: string): -1 | 0 | 1 {
     return cleanA < cleanB ? -1 : cleanA > cleanB ? 1 : 0;
 }
 
+function compareFile(a: string, b: string): -1 | 0 | 1 {
+    return compareString(a.replace(/^[./]*/g, ""), b.replace(/^[./]*/g, ""));
+}
+
 function compareImport(a: Import, b: Import): -1 | 0 | 1 {
-    const isMultipleA = a.values.split(/,/g).length > 1;
-    const isMultipleB = b.values.split(/,/g).length > 1;
+    const aValues = Array.isArray(a.values) ? `{ ${a.values.join(", ")} }` : a.values;
+    const bValues = Array.isArray(b.values) ? `{ ${b.values.join(", ")} }` : b.values;
+    const isMultipleA = aValues.split(/,/g).length > 1;
+    const isMultipleB = bValues.split(/,/g).length > 1;
     if (isMultipleA && isMultipleB) {
-        if (a.values === b.values) {
-            return compareString(a.file, b.file);
+        if (a.file === b.file) {
+            return compareFile(a.file, b.file);
         }
-        return compareString(a.values, b.values);
+        return compareString(aValues, bValues);
     }
     if (isMultipleA) {
         return -1;
@@ -100,28 +138,25 @@ function compareImport(a: Import, b: Import): -1 | 0 | 1 {
     if (isMultipleB) {
         return 1;
     }
-    if (a.values === b.values) {
-        return compareString(a.file, b.file);
+    if (aValues === bValues) {
+        return compareFile(a.file, b.file);
     }
-    return compareString(a.values, b.values);
+    return compareString(aValues, bValues);
 }
 
-export function genActions(libPath: string, prefix: string, path: string, imports: Imports, redux: Redux): string {
+export function genActions(maxLineLength: number, libPath: string, prefix: string, path: string, imports: Imports, redux: Redux): string {
     const lines: string[] = [];
     lines.push("// DO NOT EDIT - AUTOMATICALLY GENERATED!");
     lines.push(`// This file is generated from ${path}, edit that file instead.`);
     lines.push("");
     const importList: Import[] = [
-        { file: libPath, values: "{ Action, deepFreeze }" },
+        { file: libPath, values: ["Action", "deepFreeze"] },
         ...Object.keys(imports).map((importName) => ({
             file: importName,
             values: imports[importName],
         })),
     ];
-    importList.sort(compareImport);
-    for (const { file, values } of importList) {
-        lines.push(`import ${values} from ${JSON.stringify(file)};`);
-    }
+    lines.push(...printImports(maxLineLength, importList));
     lines.push("");
 
     const reduxKeys = Object.keys(redux);
@@ -151,7 +186,11 @@ export function genActions(libPath: string, prefix: string, path: string, import
     lines.push("");
 
     for (const key of reduxKeys) {
-        lines.push(`export function ${makeAction(prefix, key)}Action(${makeArgs(redux[key])}): I${makeName(prefix, key)}Action {`);
+        let actionFunction = `export function ${makeAction(prefix, key)}Action(${makeArgs(redux[key])}): I${makeName(prefix, key)}Action {`;
+        if (actionFunction.length > maxLineLength) {
+            actionFunction = `export function ${makeAction(prefix, key)}Action(${makeUnlinedArgs(redux[key], 4)}): I${makeName(prefix, key)}Action {`;
+        }
+        lines.push(actionFunction);
         lines.push("    return Object.freeze({");
         lines.push(`        type: ${makeType("", key)},`);
         for (const member of Object.keys(redux[key])) {
@@ -162,22 +201,40 @@ export function genActions(libPath: string, prefix: string, path: string, import
         lines.push("");
     }
 
-    lines.push(`export type ${makeName(prefix, "Reducer")}<State> = (state: Readonly<State> | undefined, action: Readonly<${makeName(prefix, "Actions")}>) => State;`);
-    lines.push("");
+    lines.push(
+        `export type ${makeName(prefix, "Reducer")}<State> = (state: Readonly<State> | undefined, action: Readonly<${makeName(prefix, "Actions")}>) => State;`,
+        ""
+    );
 
     lines.push(`export interface ${makeName(prefix, "ReducerCallbacks")}<State> {`);
     for (const key of reduxKeys) {
-        lines.push(`    ${makeAction("", key)}: (${mergeArgs("state: Readonly<State>", makeArgs(redux[key]))}) => State;`);
+        const stateArgs = {
+            state: "Readonly<State>",
+            ...redux[key],
+        };
+        let callbackLine = `    ${makeAction("", key)}: (${makeArgs(stateArgs)}) => State;`;
+        if (callbackLine.length > maxLineLength) {
+            callbackLine = `    ${makeAction("", key)}: (${makeUnlinedArgs(stateArgs, 8)}) => State;`;
+        }
+        lines.push(callbackLine);
     }
     lines.push("}");
     lines.push("");
 
-    lines.push(
-        `export function gen${makeName(prefix, "Reducer")}<State>(initialState: State, callbacks: ${makeName(
-            prefix,
-            "ReducerCallbacks"
-        )}<State>, freeze: (state: State) => State = deepFreeze): ${makeName(prefix, "Reducer")}<State> {`
-    );
+    let reducerLine = `export function gen${makeName(prefix, "Reducer")}<State>(initialState: State, callbacks: ${makeName(
+        prefix,
+        "ReducerCallbacks"
+    )}<State>, freeze: (state: State) => State = deepFreeze): ${makeName(prefix, "Reducer")}<State> {`;
+    if (reducerLine.length > maxLineLength) {
+        reducerLine = [
+            `export function gen${makeName(prefix, "Reducer")}<State>(`,
+            `    initialState: State,`,
+            `    callbacks: ${makeName(prefix, "ReducerCallbacks")}<State>,`,
+            `    freeze: (state: State) => State = deepFreeze`,
+            `): ${makeName(prefix, "Reducer")}<State> {`,
+        ].join("\n");
+    }
+    lines.push(reducerLine);
     lines.push(`    return (state: Readonly<State> = initialState, action: Readonly<${makeName(prefix, "Actions")}>): State => {`);
 
     lines.push("        let freezeFunc = freeze;");
@@ -192,7 +249,17 @@ export function genActions(libPath: string, prefix: string, path: string, import
     lines.push("        switch (action.type) {");
     for (const key of reduxKeys) {
         lines.push(`            case ${makeType("", key)}:`);
-        lines.push(`                return freezeFunc(callbacks.${makeAction("", key)}(${mergeArgs("state", makePassArgs("action", redux[key]))}));`);
+        let funcCall = `                return freezeFunc(callbacks.${makeAction("", key)}(${mergeArgs("state", makePassArgs("action", redux[key]))}));`;
+        if (funcCall.length > maxLineLength) {
+            funcCall = [
+                `                return freezeFunc(`,
+                `                    callbacks.${makeAction("", key)}(`,
+                `                        ${mergeArgs("state", makePassArgs("action", redux[key])).replace(/ /g, "\n                        ")}`,
+                `                    )`,
+                `                );`,
+            ].join("\n");
+        }
+        lines.push(funcCall);
     }
     lines.push("            default:");
     lines.push("                return freezeFunc(state);");
@@ -204,22 +271,37 @@ export function genActions(libPath: string, prefix: string, path: string, import
     return lines.join("\n");
 }
 
-export function genReducer(prefix: string, path: string, imports: Imports, actions: Redux, state: State, reducer: Reducer): string {
+export function genReducer(
+    maxLineLength: number,
+    libPath: string,
+    reactEnabled: boolean,
+    reactModule: string,
+    reactReduxModule: string,
+    prefix: string,
+    path: string,
+    imports: Imports,
+    actions: Redux,
+    state: State,
+    reducer: Reducer
+): string {
     const lines: string[] = [];
     lines.push("// DO NOT EDIT - AUTOMATICALLY GENERATED!");
     lines.push(`// This file is generated from ${path}, edit that file instead.`);
     lines.push("");
+    const actionImports = [`gen${makeName(prefix, "Reducer")}`, ...Object.keys(actions).map((action) => `${makeAction(prefix, action)}Action`)];
     const importList: Import[] = [
-        { file: "./actions", values: `{ gen${makeName(prefix, "Reducer")} }` },
+        { file: "./actions", values: actionImports },
+        { file: libPath, values: ["Dispatch"] },
         ...Object.keys(imports).map((importName) => ({
             file: importName,
             values: imports[importName],
         })),
     ];
-    importList.sort(compareImport);
-    for (const { file, values } of importList) {
-        lines.push(`import ${values} from ${JSON.stringify(file)};`);
+    if (reactEnabled) {
+        importList.push({ file: reactModule, values: ["ComponentType"] });
+        importList.push({ file: reactReduxModule, values: ["connect", "ConnectedComponent", "DistributiveOmit", "GetProps", "Matching"] });
     }
+    lines.push(...printImports(maxLineLength, importList));
     lines.push("");
 
     lines.push(`export interface ${makeName(prefix, "State")} {`);
@@ -244,16 +326,23 @@ export function genReducer(prefix: string, path: string, imports: Imports, actio
             continue;
         }
         if (reducerConfig === "default") {
-            lines.push(`    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(prefix, "State")} => ({`);
-            lines.push(`        ...state,`);
+            lines.push(
+                `    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(
+                    prefix,
+                    "State"
+                )} => ({`,
+                `        ...state,`
+            );
             for (const stateKey of Object.keys(actions[action])) {
                 lines.push(`        ${stateKey},`);
             }
             lines.push(`    }),`);
             continue;
         }
-        lines.push(`    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(prefix, "State")} => ({`);
-        lines.push(`        ...state,`);
+        lines.push(
+            `    ${makeAction(action)}: (${mergeArgs(`state: ${makeName(prefix, "State")}`, makeArgs(actions[action]))}): ${makeName(prefix, "State")} => ({`,
+            `        ...state,`
+        );
         for (const stateKey of Object.keys(reducerConfig)) {
             lines.push(`        ${stateKey}: ${reducerConfig[stateKey]},`);
         }
@@ -261,6 +350,72 @@ export function genReducer(prefix: string, path: string, imports: Imports, actio
     }
     lines.push("});");
     lines.push("");
+    lines.push(genMapStateToProps(prefix, state));
+    lines.push("");
+    lines.push(genMapDispatchToProps(prefix, actions));
+    lines.push("");
+    if (reactEnabled) {
+        lines.push(
+            `export function connect${makeName(prefix)}<C extends ComponentType<Matching<${makeName(prefix, "StateProps")} & ${makeName(
+                prefix,
+                "DispatchProps"
+            )}, GetProps<C>>>>(`,
+            "    component: C",
+            `): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (${makeName(prefix, "StateProps")} & ${makeName(
+                prefix,
+                "DispatchProps"
+            )}), keyof GetProps<C>>>> {`,
+            "    return connect(mapStateToProps, mapDispatchToProps)(component);",
+            "}",
+            ""
+        );
+    }
+
+    return lines.join("\n");
+}
+
+export function genMapStateToProps(prefix: string, state: State): string {
+    const lines: string[] = [];
+
+    lines.push(`export interface ${makeName(prefix, "StateProps")} {`);
+    for (const [name, def] of Object.entries(state)) {
+        if (!def.internal) {
+            lines.push(`    ${name}: ${def.type};`);
+        }
+    }
+    lines.push("}");
+    lines.push("");
+    lines.push(`export function mapStateToProps(state: ${makeName(prefix, "State")}): ${makeName(prefix, "StateProps")} {`);
+    lines.push("    return {");
+    for (const [name, def] of Object.entries(state)) {
+        if (!def.internal) {
+            lines.push(`        ${name}: state.${name},`);
+        }
+    }
+    lines.push("    };");
+    lines.push("}");
+
+    return lines.join("\n");
+}
+
+export function genMapDispatchToProps(prefix: string, actions: Redux): string {
+    const lines: string[] = [];
+
+    lines.push(`export interface ${makeName(prefix, "DispatchProps")} {`);
+    for (const [action, payload] of Object.entries(actions)) {
+        lines.push(`    ${makeAction(action)}(${makeArgs(payload)}): void;`);
+    }
+    lines.push("}");
+    lines.push("");
+    lines.push(`export function mapDispatchToProps(dispatch: Dispatch): ${makeName(prefix, "DispatchProps")} {`);
+    lines.push("    return {");
+    for (const [action, payload] of Object.entries(actions)) {
+        lines.push(
+            `        ${makeAction(action)}: (${makeArgs(payload)}): void => dispatch(${makeAction(prefix, action)}Action(${Object.keys(payload).join(", ")})),`
+        );
+    }
+    lines.push("    };");
+    lines.push("}");
 
     return lines.join("\n");
 }
@@ -273,6 +428,8 @@ export function genLibrary(): string {
         "export interface Action<T> {",
         "    type: T;",
         "}",
+        "",
+        "export type Dispatch<T = unknown> = (action: Action<T>) => void;",
         "",
         "const objPrototype = Object.getPrototypeOf({});",
         "",

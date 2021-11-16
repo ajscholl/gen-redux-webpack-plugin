@@ -1,0 +1,23 @@
+actions:
+  increaseCount: {}
+
+state:
+  count:
+    type: number
+    default: 0
+  hiddenCount:
+    type: number
+    default: 0
+    internal: true
+
+reducer:
+  increaseCount:
+    count: "state.hiddenCount > 0 ? state.count + 1 : state.count"
+    hiddenCount: "state.hiddenCount === 0 ? 1 : 0"
+
+options:
+  react:
+    enabled: true
+    modules:
+      react: "../react2"
+      react-redux: "../react-redux2"

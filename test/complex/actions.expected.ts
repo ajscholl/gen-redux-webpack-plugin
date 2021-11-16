@@ -103,7 +103,17 @@ export function complexSetMultipleAction(choice: number | string): IComplexSetMu
     });
 }
 
-export function complexManyArgsAction(arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number, arg9: number): IComplexManyArgsAction {
+export function complexManyArgsAction(
+    arg1: number,
+    arg2: number,
+    arg3: number,
+    arg4: number,
+    arg5: number,
+    arg6: number,
+    arg7: number,
+    arg8: number,
+    arg9: number
+): IComplexManyArgsAction {
     return Object.freeze({
         type: MANY_ARGS,
         arg1,
@@ -177,7 +187,18 @@ export type ComplexReducer<State> = (state: Readonly<State> | undefined, action:
 export interface ComplexReducerCallbacks<State> {
     setCallback: (state: Readonly<State>, callback: () => void) => State;
     setMultiple: (state: Readonly<State>, choice: number | string) => State;
-    manyArgs: (state: Readonly<State>, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number, arg9: number) => State;
+    manyArgs: (
+        state: Readonly<State>,
+        arg1: number,
+        arg2: number,
+        arg3: number,
+        arg4: number,
+        arg5: number,
+        arg6: number,
+        arg7: number,
+        arg8: number,
+        arg9: number
+    ) => State;
     action1: (state: Readonly<State>) => State;
     action2: (state: Readonly<State>) => State;
     action3: (state: Readonly<State>) => State;
@@ -189,7 +210,11 @@ export interface ComplexReducerCallbacks<State> {
     action9: (state: Readonly<State>) => State;
 }
 
-export function genComplexReducer<State>(initialState: State, callbacks: ComplexReducerCallbacks<State>, freeze: (state: State) => State = deepFreeze): ComplexReducer<State> {
+export function genComplexReducer<State>(
+    initialState: State,
+    callbacks: ComplexReducerCallbacks<State>,
+    freeze: (state: State) => State = deepFreeze
+): ComplexReducer<State> {
     return (state: Readonly<State> = initialState, action: Readonly<ComplexActions>): State => {
         let freezeFunc = freeze;
         if (process.env.DEVELOPMENT === "true") {
@@ -205,7 +230,20 @@ export function genComplexReducer<State>(initialState: State, callbacks: Complex
             case SET_MULTIPLE:
                 return freezeFunc(callbacks.setMultiple(state, action.choice));
             case MANY_ARGS:
-                return freezeFunc(callbacks.manyArgs(state, action.arg1, action.arg2, action.arg3, action.arg4, action.arg5, action.arg6, action.arg7, action.arg8, action.arg9));
+                return freezeFunc(
+                    callbacks.manyArgs(
+                        state,
+                        action.arg1,
+                        action.arg2,
+                        action.arg3,
+                        action.arg4,
+                        action.arg5,
+                        action.arg6,
+                        action.arg7,
+                        action.arg8,
+                        action.arg9
+                    )
+                );
             case ACTION1:
                 return freezeFunc(callbacks.action1(state));
             case ACTION2:

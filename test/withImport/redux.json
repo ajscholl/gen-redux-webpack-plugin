@@ -2,17 +2,19 @@
     "imports": {
         "actions": {
             "./hasDefault": "DefaultObject",
-            "./normal": "{ NormalObject, OtherObject }"
+            "./normal": "{ NormalObject, OtherObject }",
+            "./importList": ["Identity", "Absolute"]
         }
     },
     "actions": {
         "publishDefault": {
-            "def": "DefaultObject",
+            "def": "Identity<DefaultObject>",
             "isDefault": "boolean"
         },
         "publishNormal": {
             "object": "NormalObject",
-            "other": "OtherObject"
+            "other": "OtherObject",
+            "otherAbsolute": "Absolute<number>"
         }
     }
 }

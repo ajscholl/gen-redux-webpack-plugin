@@ -63,6 +63,10 @@ instead of using the webpack plugin. It accepts the following options:
   if not specified.
 - `--libFile PATH`: Write the library files to this path. You also need to specify
   `--libPath` to get the correct import location.
+- `--react`: Enables generation of a react-redux style connect function per reducer.
+- `--reactModule MODULE`: Overwrite the default react import name.
+- `--reactReduxModule MODULE`: Overwrite the default react-redux import name.
+- `--maxLineLength LENGTH`: Set the maximum line length of the generated code.
 - `--watch`: After processing the specified directories, continue watching them
   for changes and reprocess them as changes occur.
 
@@ -83,6 +87,7 @@ imports:
   actions:
     # We need to import the type of our Todo so an action can carry a field of
     # that type.
+    # This could also be written as ./types: ["Todo"]
     ./types: "{ Todo }"
   reducer:
     # The reducer also needs to import the type. We additionally need to import
@@ -118,6 +123,10 @@ state:
   todos:
     type: Todo[]
     default: "[]"
+    # Optional attribute for state values we don't want to automatically expose
+    # to our components. If specified as true, the generated mapStateToProps method
+    # will skip this field.
+    internal: false
 
 # Each action needs to be handled by the reducer. We can either set a string of
 # code for each field we want to overwrite in the state or let the plugin generate
@@ -137,6 +146,18 @@ reducer:
     todos: "state.todos.filter((elem) => elem.id !== todo.id)"
   clearTodos:
     todos: "[]"
+
+# Allows overwriting commandline or plugin (webpack) options per reducer
+options:
+  react:
+    # Enable generation of `connectTodoApp`
+    enabled: true
+    modules:
+      # Overwrite react and react-redux imports. In this case, we don't change them though.
+      react: "react"
+      react-redux: "react-redux"
+  # Set maximum number of characters for the generated files
+  maxLineLength: 160
 ```
 
 This generates two files, `actions.ts` and `reducer.ts`. Let us start with the reducer:
@@ -172,6 +193,37 @@ export const todoAppReducer = genTodoAppReducer(initialState, {
         todos: [],
     }),
 });
+
+export interface TodoAppStateProps {
+    todos: Todo[];
+}
+
+export function mapStateToProps(state: TodoAppState): TodoAppStateProps {
+    return {
+        todos: state.todos,
+    };
+}
+
+export interface TodoAppDispatchProps {
+    addTodo(todo: Todo): void;
+    addTwoTodos(firstTodo: Todo, secondTodo: Todo): void;
+    /* ... */
+}
+
+export function mapDispatchToProps(dispatch: Dispatch): TodoAppDispatchProps {
+    return {
+        addTodo: (todo: Todo): void => dispatch(todoAppAddTodoAction(todo)),
+        addTwoTodos: (firstTodo: Todo, secondTodo: Todo): void => dispatch(todoAppAddTwoTodosAction(firstTodo, secondTodo)),
+        /* ... */
+    };
+}
+
+export function connectTodoApp<C extends ComponentType<Matching<TodoAppStateProps & TodoAppDispatchProps, GetProps<C>>>>(
+    component: C
+): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (TodoAppStateProps & TodoAppDispatchProps), keyof GetProps<C>>>> {
+    return connect(mapStateToProps, mapDispatchToProps)(component);
+}
+
 ```
 
 We can see how our state specification got translated to the `TodoAppState` type
@@ -179,6 +231,10 @@ as well as the `initialState`. Next we see that the plugin created an export cal
 `todoAppReducer` by using the `genTodoAppReducer` function. That function is specified
 in `actions.ts` and expects a callback for each of our actions. There we then simply
 map the state to a new state, having all fields of our action in scope.
+
+We also see the methods `mapStateToProps`, `mapDispatchToProps`, and `connectTodoApp`.
+They allow us to easily expose the whole state and all actions (if we want to) to
+a React Component.
 
 Next we look at `actions.ts`:
 

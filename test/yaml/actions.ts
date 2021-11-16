@@ -26,7 +26,11 @@ export interface YamlReducerCallbacks<State> {
     setDefault: (state: Readonly<State>, newDefault: DefaultObject) => State;
 }
 
-export function genYamlReducer<State>(initialState: State, callbacks: YamlReducerCallbacks<State>, freeze: (state: State) => State = deepFreeze): YamlReducer<State> {
+export function genYamlReducer<State>(
+    initialState: State,
+    callbacks: YamlReducerCallbacks<State>,
+    freeze: (state: State) => State = deepFreeze
+): YamlReducer<State> {
     return (state: Readonly<State> = initialState, action: Readonly<YamlActions>): State => {
         let freezeFunc = freeze;
         if (process.env.DEVELOPMENT === "true") {

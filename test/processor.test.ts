@@ -3,12 +3,15 @@ import { Processor } from "../src";
 import { cwd } from "process";
 import { relative } from "path";
 
-const tests = ["simple", "withImport", "complex", "yaml", "reducer", "todoApp"];
+const tests = ["simple", "withImport", "complex", "yaml", "reducer", "todoApp", "hiddenState"];
 
 async function runTest(test: string): Promise<void> {
     const path = relative(cwd(), `${__dirname}/${test}`);
     const processor = new Processor();
     processor.setLibPath("../utils", "test/utils.ts");
+    processor.setReactEnabled(true);
+    processor.setReactModule("../react");
+    processor.setReactReduxModule("../react-redux");
     await processor.processFiles([`${path}`]);
     const generated = await readFile(`${path}/actions.ts`);
     const expected = await readFile(`${path}/actions.expected.ts`);

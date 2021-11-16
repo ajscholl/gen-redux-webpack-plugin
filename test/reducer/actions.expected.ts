@@ -113,7 +113,11 @@ export interface ReducerReducerCallbacks<State> {
     otherAction: (state: Readonly<State>, field: number) => State;
 }
 
-export function genReducerReducer<State>(initialState: State, callbacks: ReducerReducerCallbacks<State>, freeze: (state: State) => State = deepFreeze): ReducerReducer<State> {
+export function genReducerReducer<State>(
+    initialState: State,
+    callbacks: ReducerReducerCallbacks<State>,
+    freeze: (state: State) => State = deepFreeze
+): ReducerReducer<State> {
     return (state: Readonly<State> = initialState, action: Readonly<ReducerActions>): State => {
         let freezeFunc = freeze;
         if (process.env.DEVELOPMENT === "true") {

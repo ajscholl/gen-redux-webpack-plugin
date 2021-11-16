@@ -82,7 +82,11 @@ export interface TodoAppReducerCallbacks<State> {
     clearTodos: (state: Readonly<State>) => State;
 }
 
-export function genTodoAppReducer<State>(initialState: State, callbacks: TodoAppReducerCallbacks<State>, freeze: (state: State) => State = deepFreeze): TodoAppReducer<State> {
+export function genTodoAppReducer<State>(
+    initialState: State,
+    callbacks: TodoAppReducerCallbacks<State>,
+    freeze: (state: State) => State = deepFreeze
+): TodoAppReducer<State> {
     return (state: Readonly<State> = initialState, action: Readonly<TodoAppActions>): State => {
         let freezeFunc = freeze;
         if (process.env.DEVELOPMENT === "true") {
