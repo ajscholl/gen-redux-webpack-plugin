@@ -44,15 +44,25 @@ new GenReduxActionsPlugin({
 new GenReduxActionsPlugin({
     libPath: "src/reduxUtils",
     libFile: "src/reduxUtils.ts",
+    reactEnabled: false,
+    reactModule: "react",
+    reactReduxModule: "react-redux",
+    maxLineLength: 160,
 });
 ```
 
-The plugin takes two optional options:
+The plugin takes six optional options:
 
 - `libPath` specifies the path used to import additional utility functions from.
   It defaults to `"src/reduxUtils"`.
 - `libFile` specifies the filepath to generate the utility functions in. It defaults
   to `` `${libPath}.ts` ``.
+- `reactEnabled` enables the generation of methods connecting a component with a
+  reducer. It defaults to `false`.
+- If react is enabled, `reactModule` and `reactReduxModule` specify the names we
+  import react and react-redux from. The defaults are `"react"` and `"react-redux"`.
+- `maxLineLength` gives the code generator a hint about how to properly format the
+  code. It defaults to `160`.
 
 ## Command line
 
@@ -81,6 +91,28 @@ adding inline comments and is easier to read. Below you find an example for a si
 TODO app:
 
 ```yml
+# Add the contents of other files to this file. This will read the file and then
+# combine the imports, actions, state, reducer, and options with this file. Imports
+# are resolved relative to the included file (so you can include a file from two
+# different files and the imports will work correctly). You must not define conflicting
+# options, actions, or other fields.
+# The included files are assumed to be empty in this example and thus not further
+# considered.
+include:
+  # Either specify the path directly...
+  - ./some/other/file.yml
+  # Or provide an object with a file and an optional prefix.
+  - file: ../this/other/file.json
+    # Setting a prefix will rename all actions, state fields, etc., by appending
+    # the prefix. This allows you to include the same file twice with a different
+    # prefix or merge two otherwise conflicting files.
+    prefix: otherFile
+    # Setting a group allows you to define a scope for an included file. If you
+    # are generating "connect" methods for react, you will get an additional
+    # connect method per group which only provides access to the state and actions
+    # of that group.
+    group: other
+
 # Specify any additional imports you need for your reducer or actions here.
 # If you don't need any additional imports, you can skip defining this section.
 imports:

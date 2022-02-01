@@ -1,0 +1,27 @@
+include:
+  - file: ../complex/redux.json
+    prefix: complex
+  - file: ../hiddenState/redux.yml
+    prefix: hiddenState
+    group: hiddenState
+  - file: ../include/redux.yml
+    prefix: include
+    group: included
+  - file: ../reducer/main.yml
+    prefix: reducer
+    group: reducer
+  - file: ../simple/redux.json
+    prefix: simple
+  - file: ../todoApp/redux.yml
+    prefix: todoApp
+  - file: ../withImport/redux.json
+    prefix: withImport
+  - file: ../yaml/redux.yml
+    prefix: yaml
+
+imports:
+  # add missing imports as some tests didn't generate a reducer and thus lacked the imports there
+  reducer:
+    ../withImport/hasDefault: DefaultObject
+    ../withImport/normal: "{ NormalObject, OtherObject }"
+    ../withImport/importList: ["Identity", "Absolute"]

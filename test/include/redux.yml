@@ -1,0 +1,11 @@
+include:
+  - ../todoApp/redux.yml
+  - file: ../hiddenState/redux.yml
+    prefix: hiddenState
+    group: hiddenState
+  - file: ../hiddenState/redux.yml
+    group: anotherHiddenState
+  - file: ./indirectHiddenState.yml
+    group: indirectHiddenState
+  - file: ../hiddenState/redux.yml
+    group: aLastHiddenState

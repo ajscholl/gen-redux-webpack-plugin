@@ -4,10 +4,10 @@ actions:
 state:
   count:
     type: number
-    default: 0
+    default: "0"
   hiddenCount:
     type: number
-    default: 0
+    default: "0"
     internal: true
 
 reducer:

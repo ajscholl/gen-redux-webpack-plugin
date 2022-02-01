@@ -1,29 +1,6 @@
-import * as yaml from "yaml";
-import { Imports, Reducer, Redux, State, genActions, genLibrary, genReducer } from "./generator";
-import { exists, readFile, readdir, stat, writeFile } from "./utils";
-import { dirname } from "path";
-
-interface ReduxFile {
-    imports?: {
-        actions?: Imports;
-        reducer?: Imports;
-    };
-    actions: Redux;
-    state?: State;
-    reducer?: Reducer;
-    options?: ReduxOptions;
-}
-
-interface ReduxOptions {
-    react?: {
-        enabled?: boolean;
-        modules?: {
-            react?: string;
-            "react-redux"?: string;
-        };
-    };
-    maxLineLength?: number;
-}
+import { exists, mapErrorAsync, readFile, readdir, stat, writeFile } from "./utils";
+import { genActions, genLibrary, genReducer } from "./generator";
+import { loadFile } from "./definition";
 
 export default class Processor {
     private libPath: string;
@@ -78,18 +55,11 @@ export default class Processor {
             if (entryPoint.indexOf("node_modules") !== -1) {
                 continue;
             }
-            try {
-                await this.processDir(dirname(entryPoint));
-            } catch (error) {
-                console.error("Failed to process directory:", entryPoint, error);
-            }
+            await mapErrorAsync(
+                () => this.processDir(entryPoint),
+                (message) => `Failed to process directory ${entryPoint}: ${message}`
+            );
         }
-    }
-
-    private async loadRedux(path: string): Promise<ReduxFile | undefined | null> {
-        const str = await readFile(path);
-
-        return path.endsWith(".yml") ? yaml.parse(str) : JSON.parse(str);
     }
 
     private async processDir(dir: string): Promise<void> {
@@ -102,12 +72,12 @@ export default class Processor {
             } else if (info.isFile() && (file === "redux.json" || file === "redux.yml")) {
                 const prefixParts = dir.split("/");
                 const prefix = (prefixParts[prefixParts.length - 1] || "").replace(/[^\w]/g, "");
-                const spec = await this.loadRedux(path);
+                const spec = await loadFile(path, undefined, []);
                 if (!spec) {
                     continue;
                 }
                 const { imports, actions, state, reducer, options } = spec;
-                if (!actions) {
+                if (actions === undefined || Object.keys(actions).length === 0) {
                     continue;
                 }
                 let reactEnabled = this.reactEnabled;

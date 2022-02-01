@@ -1,4 +1,5 @@
 import Processor from "./processor";
+import { dirname } from "path";
 
 interface Compiler {
     hooks: {
@@ -61,9 +62,9 @@ export default class GenReduxActionsPlugin {
             const entryPoints = compilation.options.entry;
 
             if (Array.isArray(entryPoints)) {
-                await this.processor.processFiles(entryPoints);
+                await this.processor.processFiles(entryPoints.map(dirname));
             } else if (typeof entryPoints === "object" && entryPoints !== null) {
-                await this.processor.processFiles(Object.keys(entryPoints).map((key) => entryPoints[key]));
+                await this.processor.processFiles(Object.keys(entryPoints).map((key) => dirname(entryPoints[key])));
             }
         });
     }
