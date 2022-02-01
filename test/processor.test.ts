@@ -3,7 +3,7 @@ import { Processor } from "../src";
 import { cwd } from "process";
 import { relative } from "path";
 
-const tests = ["simple", "withImport", "complex", "yaml", "reducer", "todoApp", "hiddenState"];
+const tests = ["combined", "complex", "hiddenState", "include", "reducer", "simple", "todoApp", "withImport", "yaml"];
 
 async function runTest(test: string): Promise<void> {
     const path = relative(cwd(), `${__dirname}/${test}`);
@@ -12,7 +12,7 @@ async function runTest(test: string): Promise<void> {
     processor.setReactEnabled(true);
     processor.setReactModule("../react");
     processor.setReactReduxModule("../react-redux");
-    await processor.processFiles([`${path}`]);
+    await processor.processFiles([path]);
     const generated = await readFile(`${path}/actions.ts`);
     const expected = await readFile(`${path}/actions.expected.ts`);
     expect(generated).toEqual(expected);

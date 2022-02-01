@@ -1,0 +1,3 @@
+include:
+  - file: ../hiddenState/redux.yml
+    group: nested

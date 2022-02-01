@@ -1,4 +1,5 @@
 import * as chokidar from "chokidar";
+import { basename, dirname } from "path";
 import { Processor } from ".";
 
 export default class Watcher {
@@ -25,9 +26,9 @@ export default class Watcher {
             case "add":
             case "addDir":
             case "change":
-                if (file.endsWith("/redux.json") || file.endsWith("/redux.yml")) {
-                    const path = file.replace(/\/redux\.(json|yml)$/, "");
-                    console.error(`Detected change in ${path}`);
+                if (basename(file) === "redux.json" || basename(file) === "redux.yml") {
+                    const path = dirname(file);
+                    console.info(`Detected change in ${path}`);
                     this.processor.processFiles([path]);
                 }
                 break;

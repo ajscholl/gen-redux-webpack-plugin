@@ -23,3 +23,25 @@ export function exists(path: string): Promise<boolean> {
 export function unlink(path: string): Promise<void> {
     return new Promise((resolve, reject) => fs.unlink(path, (err) => (err ? reject(err) : resolve())));
 }
+
+export function mapError<T>(f: () => T, mapper: (message: string) => string): T {
+    try {
+        return f();
+    } catch (error) {
+        if (error instanceof Error) {
+            error.message = mapper(error.message);
+        }
+        throw error;
+    }
+}
+
+export async function mapErrorAsync<T>(f: () => Promise<T>, mapper: (message: string) => string): Promise<T> {
+    try {
+        return await f();
+    } catch (error) {
+        if (error instanceof Error) {
+            error.message = mapper(error.message);
+        }
+        throw error;
+    }
+}
