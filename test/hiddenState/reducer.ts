@@ -1,7 +1,7 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/hiddenState/redux.yml, edit that file instead.
 
-import { ConnectedComponent, DistributiveOmit, GetProps, Matching, connect } from "../react-redux2";
+import { ConnectedComponent, DistributiveOmit, GetLibraryManagedProps, GetProps, Matching, Shared, connect } from "../react-redux2";
 import { genHiddenStateReducer, hiddenStateIncreaseCountAction } from "./actions";
 import { ComponentType } from "../react2";
 import { Dispatch } from "../utils";
@@ -46,6 +46,9 @@ export function mapDispatchToProps(dispatch: Dispatch): HiddenStateDispatchProps
 
 export function connectHiddenState<C extends ComponentType<Matching<HiddenStateStateProps & HiddenStateDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (HiddenStateStateProps & HiddenStateDispatchProps), keyof GetProps<C>>>> {
+): ConnectedComponent<
+    C,
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<HiddenStateStateProps & HiddenStateDispatchProps, GetLibraryManagedProps<C>>> & keyof GetProps<C>
+> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }

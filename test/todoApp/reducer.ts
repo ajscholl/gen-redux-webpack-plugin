@@ -1,7 +1,7 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/todoApp/redux.yml, edit that file instead.
 
-import { ConnectedComponent, DistributiveOmit, GetProps, Matching, connect } from "../react-redux";
+import { ConnectedComponent, DistributiveOmit, GetLibraryManagedProps, GetProps, Matching, Shared, connect } from "../react-redux";
 import {
     genTodoAppReducer,
     todoAppAddTodoAction,
@@ -76,6 +76,9 @@ export function mapDispatchToProps(dispatch: Dispatch): TodoAppDispatchProps {
 
 export function connectTodoApp<C extends ComponentType<Matching<TodoAppStateProps & TodoAppDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (TodoAppStateProps & TodoAppDispatchProps), keyof GetProps<C>>>> {
+): ConnectedComponent<
+    C,
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<TodoAppStateProps & TodoAppDispatchProps, GetLibraryManagedProps<C>>> & keyof GetProps<C>
+> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }

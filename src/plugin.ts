@@ -1,24 +1,6 @@
+import { Compiler, EntryNormalized } from "webpack";
 import Processor from "./processor";
 import { dirname } from "path";
-
-interface Compiler {
-    hooks: {
-        afterEmit: {
-            tap(name: string, callback: (compilation: Compilation) => Promise<void>): void;
-        };
-    };
-}
-
-interface Compilation {
-    options: {
-        entry:
-            | null
-            | string[]
-            | {
-                  [key: string]: string;
-              };
-    };
-}
 
 export interface GenReduxActionsPluginOptions {
     /** Path to import the gen-redux-actions-plugin library from */
@@ -59,13 +41,11 @@ export default class GenReduxActionsPlugin {
 
     public apply(compiler: Compiler): void {
         compiler.hooks.afterEmit.tap("GenReduxActionsPlugin", async (compilation) => {
-            const entryPoints = compilation.options.entry;
+            const entry: EntryNormalized = compilation.options.entry;
+            const entryPoints = typeof entry === "function" ? await entry() : entry;
+            const directories = ([] as string[]).concat(...Object.values(entryPoints).map((entryPoint) => (entryPoint.import || []).map(dirname)));
 
-            if (Array.isArray(entryPoints)) {
-                await this.processor.processFiles(entryPoints.map(dirname));
-            } else if (typeof entryPoints === "object" && entryPoints !== null) {
-                await this.processor.processFiles(Object.keys(entryPoints).map((key) => dirname(entryPoints[key])));
-            }
+            await this.processor.processFiles(directories);
         });
     }
 }

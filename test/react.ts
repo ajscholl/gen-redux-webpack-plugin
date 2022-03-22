@@ -1,1 +1,1 @@
-export type ComponentType<T> = T;
+export { ComponentType } from "react";

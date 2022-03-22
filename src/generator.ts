@@ -327,7 +327,10 @@ export function genReducer(
     ];
     if (reactEnabled) {
         importList.push({ file: reactModule, values: ["ComponentType"] });
-        importList.push({ file: reactReduxModule, values: ["connect", "ConnectedComponent", "DistributiveOmit", "GetProps", "Matching"] });
+        importList.push({
+            file: reactReduxModule,
+            values: ["connect", "ConnectedComponent", "DistributiveOmit", "GetLibraryManagedProps", "GetProps", "Matching", "Shared"],
+        });
     }
     lines.push(...printImports(maxLineLength, importList));
     lines.push("");
@@ -453,26 +456,32 @@ export function genReducer(
                 lines.push(connectSignature);
             }
             lines.push("    component: C");
-            const props = `DistributiveOmit<GetProps<C>, Extract<keyof (${makeName(prefix, ...group, "StateProps")} & ${makeName(
+            const propsStart = `DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<${makeName(prefix, ...group, "StateProps")} & ${makeName(
                 prefix,
                 ...group,
                 "DispatchProps"
-            )}), keyof GetProps<C>>>`;
-            const connectedComponentLine = `): ConnectedComponent<C, ${props}> {`;
+            )}, GetLibraryManagedProps<C>>> &`;
+            const propsEnd = "keyof GetProps<C>";
+            const connectedComponentLine = `): ConnectedComponent<C, ${propsStart} ${propsEnd}> {`;
             if (connectedComponentLine.length > maxLineLength) {
                 lines.push(`): ConnectedComponent<`, `    C,`);
-                const propsLine = `    ${props}`;
+                const propsLine = `    ${propsStart} ${propsEnd}`;
                 if (propsLine.length > maxLineLength) {
-                    lines.push(
-                        `    DistributiveOmit<`,
-                        `        GetProps<C>,`,
-                        `        Extract<keyof (${makeName(prefix, ...group, "StateProps")} & ${makeName(
-                            prefix,
-                            ...group,
-                            "DispatchProps"
-                        )}), keyof GetProps<C>>`,
-                        `    >`
-                    );
+                    if (propsStart.length + 4 > maxLineLength) {
+                        lines.push(
+                            `    DistributiveOmit<`,
+                            `        GetLibraryManagedProps<C>,`,
+                            `        keyof Shared<${makeName(prefix, ...group, "StateProps")} & ${makeName(
+                                prefix,
+                                ...group,
+                                "DispatchProps"
+                            )}, GetLibraryManagedProps<C>>`,
+                            `    > &`,
+                            `        ${propsEnd}`
+                        );
+                    } else {
+                        lines.push(`    ${propsStart}`, `        ${propsEnd}`);
+                    }
                 } else {
                     lines.push(propsLine);
                 }

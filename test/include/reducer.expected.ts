@@ -1,7 +1,7 @@
 // DO NOT EDIT - AUTOMATICALLY GENERATED!
 // This file is generated from test/include/redux.yml, edit that file instead.
 
-import { ConnectedComponent, DistributiveOmit, GetProps, Matching, connect } from "../react-redux2";
+import { ConnectedComponent, DistributiveOmit, GetLibraryManagedProps, GetProps, Matching, Shared, connect } from "../react-redux2";
 import {
     aLastHiddenState__IncludeIncreaseCountAction,
     anotherHiddenState__IncludeIncreaseCountAction,
@@ -162,7 +162,10 @@ export function mapDispatchToProps(dispatch: Dispatch): IncludeDispatchProps {
 
 export function connectInclude<C extends ComponentType<Matching<IncludeStateProps & IncludeDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (IncludeStateProps & IncludeDispatchProps), keyof GetProps<C>>>> {
+): ConnectedComponent<
+    C,
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<IncludeStateProps & IncludeDispatchProps, GetLibraryManagedProps<C>>> & keyof GetProps<C>
+> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }
 
@@ -192,7 +195,11 @@ export function connectIncludeALastHiddenState<
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetProps<C>, Extract<keyof (IncludeALastHiddenStateStateProps & IncludeALastHiddenStateDispatchProps), keyof GetProps<C>>>
+    DistributiveOmit<
+        GetLibraryManagedProps<C>,
+        keyof Shared<IncludeALastHiddenStateStateProps & IncludeALastHiddenStateDispatchProps, GetLibraryManagedProps<C>>
+    > &
+        keyof GetProps<C>
 > {
     return connect(mapALastHiddenStateStateToProps, mapALastHiddenStateDispatchToProps)(component);
 }
@@ -223,7 +230,11 @@ export function connectIncludeAnotherHiddenState<
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetProps<C>, Extract<keyof (IncludeAnotherHiddenStateStateProps & IncludeAnotherHiddenStateDispatchProps), keyof GetProps<C>>>
+    DistributiveOmit<
+        GetLibraryManagedProps<C>,
+        keyof Shared<IncludeAnotherHiddenStateStateProps & IncludeAnotherHiddenStateDispatchProps, GetLibraryManagedProps<C>>
+    > &
+        keyof GetProps<C>
 > {
     return connect(mapAnotherHiddenStateStateToProps, mapAnotherHiddenStateDispatchToProps)(component);
 }
@@ -250,7 +261,11 @@ export function mapHiddenStateDispatchToProps(dispatch: Dispatch): IncludeHidden
 
 export function connectIncludeHiddenState<C extends ComponentType<Matching<IncludeHiddenStateStateProps & IncludeHiddenStateDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (IncludeHiddenStateStateProps & IncludeHiddenStateDispatchProps), keyof GetProps<C>>>> {
+): ConnectedComponent<
+    C,
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<IncludeHiddenStateStateProps & IncludeHiddenStateDispatchProps, GetLibraryManagedProps<C>>> &
+        keyof GetProps<C>
+> {
     return connect(mapHiddenStateStateToProps, mapHiddenStateDispatchToProps)(component);
 }
 
@@ -281,9 +296,10 @@ export function connectIncludeIndirectHiddenStateNested<
 ): ConnectedComponent<
     C,
     DistributiveOmit<
-        GetProps<C>,
-        Extract<keyof (IncludeIndirectHiddenStateNestedStateProps & IncludeIndirectHiddenStateNestedDispatchProps), keyof GetProps<C>>
-    >
+        GetLibraryManagedProps<C>,
+        keyof Shared<IncludeIndirectHiddenStateNestedStateProps & IncludeIndirectHiddenStateNestedDispatchProps, GetLibraryManagedProps<C>>
+    > &
+        keyof GetProps<C>
 > {
     return connect(mapIndirectHiddenStateNestedStateToProps, mapIndirectHiddenStateNestedDispatchToProps)(component);
 }
