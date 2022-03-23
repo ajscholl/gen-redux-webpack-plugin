@@ -435,22 +435,30 @@ export function genReducer(
                 prefix,
                 ...group,
                 "DispatchProps"
-            )}, GetProps<C>>>`;
-            const connectSignature = `export function connect${makeName(prefix, ...group)}<${cType}>(`;
+            )}, GetProps<C>>>,`;
+            const ownType = "TOwnProps";
+            const connectSignature = `export function connect${makeName(prefix, ...group)}<${cType} ${ownType}>(`;
             if (connectSignature.length > maxLineLength) {
-                if (cType.length > maxLineLength) {
-                    lines.push(
-                        `export function connect${makeName(prefix, ...group)}<`,
-                        `    C extends ComponentType<`,
-                        `        Matching<`,
-                        `            ${makeName(prefix, ...group, "StateProps")} & ${makeName(prefix, ...group, "DispatchProps")},`,
-                        `            GetProps<C>`,
-                        `        >`,
-                        `    >`,
-                        `>(`
-                    );
+                if (cType.length + 4 > maxLineLength) {
+                    const matchingLine = `        Matching<${makeName(prefix, ...group, "StateProps")} & ${makeName(
+                        prefix,
+                        ...group,
+                        "DispatchProps"
+                    )}, GetProps<C>>`;
+                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    C extends ComponentType<`);
+                    if (matchingLine.length > maxLineLength) {
+                        lines.push(
+                            `        Matching<`,
+                            `            ${makeName(prefix, ...group, "StateProps")} & ${makeName(prefix, ...group, "DispatchProps")},`,
+                            `            GetProps<C>`,
+                            `        >`
+                        );
+                    } else {
+                        lines.push(matchingLine);
+                    }
+                    lines.push(`    >,`, `    ${ownType}`, `>(`);
                 } else {
-                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    ${cType}`, `>(`);
+                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    ${cType}`, `    ${ownType}`, `>(`);
                 }
             } else {
                 lines.push(connectSignature);
@@ -461,7 +469,7 @@ export function genReducer(
                 ...group,
                 "DispatchProps"
             )}, GetLibraryManagedProps<C>>> &`;
-            const propsEnd = "keyof GetProps<C>";
+            const propsEnd = "TOwnProps";
             const connectedComponentLine = `): ConnectedComponent<C, ${propsStart} ${propsEnd}> {`;
             if (connectedComponentLine.length > maxLineLength) {
                 lines.push(`): ConnectedComponent<`, `    C,`);

@@ -3,6 +3,7 @@
     "compilerOptions": {
         "noEmit": true,
         "rootDir": "./",
+        "jsx": "react"
     },
     "include": [
         "src",

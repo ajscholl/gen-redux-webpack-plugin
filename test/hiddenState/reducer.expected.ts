@@ -44,11 +44,11 @@ export function mapDispatchToProps(dispatch: Dispatch): HiddenStateDispatchProps
     };
 }
 
-export function connectHiddenState<C extends ComponentType<Matching<HiddenStateStateProps & HiddenStateDispatchProps, GetProps<C>>>>(
+export function connectHiddenState<C extends ComponentType<Matching<HiddenStateStateProps & HiddenStateDispatchProps, GetProps<C>>>, TOwnProps>(
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<HiddenStateStateProps & HiddenStateDispatchProps, GetLibraryManagedProps<C>>> & keyof GetProps<C>
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<HiddenStateStateProps & HiddenStateDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
 > {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }
