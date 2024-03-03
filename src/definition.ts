@@ -2,7 +2,6 @@ import * as path from "path";
 import * as yaml from "yaml";
 import * as yup from "yup";
 import { mapError, readFile } from "./utils";
-import Lazy from "yup/lib/Lazy";
 
 interface ParsedReduxActionFields {
     [field: string]: string;
@@ -13,13 +12,13 @@ export interface ReduxActionField {
     type: string;
 }
 
-const reduxActionFieldsSchema: Lazy<yup.SchemaOf<ParsedReduxActionFields>> = yup.lazy((value: unknown): yup.SchemaOf<ParsedReduxActionFields> => {
+const reduxActionFieldsSchema: yup.Lazy<ParsedReduxActionFields> = yup.lazy((value: unknown): yup.Schema<ParsedReduxActionFields> => {
     const schema = Object.keys(value && typeof value === "object" ? value : {}).reduce(
         (acc, field: keyof ParsedReduxActionFields) =>
             acc.shape({
                 [field]: yup.string().required("A field for an action needs a type"),
             }),
-        yup.object({}) as yup.SchemaOf<ParsedReduxActionFields>
+        yup.object({}) as yup.ObjectSchema<ParsedReduxActionFields>
     );
 
     return schema.required("An action needs to have fields, if you don't want to specify any fields, use an empty object instead");
@@ -40,13 +39,13 @@ export interface ReduxActions {
     [action: string]: ReduxAction;
 }
 
-const reduxSchema: Lazy<yup.SchemaOf<ParsedReduxActions>> = yup.lazy((value: unknown): yup.SchemaOf<ParsedReduxActions> => {
+const reduxSchema: yup.Lazy<ParsedReduxActions> = yup.lazy((value: unknown): yup.Schema<ParsedReduxActions> => {
     return Object.keys(value && typeof value === "object" ? value : {}).reduce(
         (acc, field: keyof ParsedReduxActions) =>
             acc.shape({
                 [field]: reduxActionFieldsSchema,
             }),
-        yup.object({}) as yup.SchemaOf<ParsedReduxActions>
+        yup.object({}) as yup.ObjectSchema<ParsedReduxActions>
     );
 });
 
@@ -62,7 +61,7 @@ export interface StateField extends ParsedStateField {
     group: string[];
 }
 
-const stateFieldSchema: yup.SchemaOf<ParsedStateField> = yup
+const stateFieldSchema: yup.Schema<ParsedStateField> = yup
     .object({
         type: yup.string().required("Please define the type for each field"),
         default: yup.string().required("Please give a default for each field"),
@@ -74,13 +73,13 @@ interface ParsedReduxStateUpdate {
     [field: string]: string;
 }
 
-const reduxStateUpdateSchema: Lazy<yup.SchemaOf<ParsedReduxStateUpdate>> = yup.lazy((value: unknown): yup.SchemaOf<ParsedReduxStateUpdate> => {
+const reduxStateUpdateSchema: yup.Lazy<ParsedReduxStateUpdate> = yup.lazy((value: unknown): yup.Schema<ParsedReduxStateUpdate> => {
     const schema = Object.keys(value && typeof value === "object" ? value : {}).reduce(
         (acc, field: keyof ParsedReduxStateUpdate) =>
             acc.shape({
                 [field]: yup.string().required("A field for an action needs a type"),
             }),
-        yup.object({}) as yup.SchemaOf<ParsedReduxStateUpdate>
+        yup.object({}) as yup.ObjectSchema<ParsedReduxStateUpdate>
     );
 
     return schema.required("An state update needs to have fields, if you don't want to update any fields, use an empty object instead");
@@ -101,14 +100,14 @@ export interface State {
     [field: string]: StateField;
 }
 
-const stateSchema: Lazy<yup.SchemaOf<ParsedState>> = yup.lazy(
-    (value: unknown): yup.SchemaOf<ParsedState> =>
+const stateSchema: yup.Lazy<ParsedState> = yup.lazy(
+    (value: unknown): yup.Schema<ParsedState> =>
         Object.keys(value && typeof value === "object" ? value : {}).reduce(
             (acc, field: keyof ParsedState) =>
                 acc.shape({
                     [field]: stateFieldSchema,
                 }),
-            yup.object({}) as yup.SchemaOf<ParsedState>
+            yup.object({}) as yup.ObjectSchema<ParsedState>
         )
 );
 
@@ -116,21 +115,21 @@ interface ParsedReducer {
     [action: string]: "default" | ParsedReduxStateUpdate;
 }
 
-function mkReducerSchema(fieldValue: unknown): yup.StringSchema | Lazy<yup.SchemaOf<ParsedReduxStateUpdate>> {
+function mkReducerSchema(fieldValue: unknown): yup.StringSchema | yup.Lazy<ParsedReduxStateUpdate> {
     return fieldValue === "default" ? yup.string().oneOf(["default"]).required() : reduxStateUpdateSchema;
 }
 
-const reducerSchema: Lazy<yup.SchemaOf<ParsedReducer>> = yup.lazy(
-    (value: unknown): yup.SchemaOf<ParsedReducer> =>
+const reducerSchema: yup.Lazy<ParsedReducer> = yup.lazy(
+    (value: unknown): yup.Schema<ParsedReducer> =>
         Object.keys(value && typeof value === "object" ? value : {}).reduce(
-            (acc: yup.SchemaOf<ParsedReducer>, field: keyof ParsedReducer): yup.SchemaOf<ParsedReducer> => {
-                const fieldSchema: Lazy<yup.AnySchema> = yup.lazy(mkReducerSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
+            (acc: yup.ObjectSchema<ParsedReducer>, field: keyof ParsedReducer): yup.ObjectSchema<ParsedReducer> => {
+                const fieldSchema: yup.Lazy<object, yup.AnyObject, ""> = yup.lazy(mkReducerSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
 
                 return acc.shape({
                     [field]: fieldSchema as unknown as yup.AnySchema,
                 });
             },
-            yup.object({}) as yup.SchemaOf<ParsedReducer>
+            yup.object({}) as yup.ObjectSchema<ParsedReducer>
         )
 );
 
@@ -148,23 +147,23 @@ export interface Imports {
     [file: string]: string | string[];
 }
 
-function mkImportsSchema(fieldValue: unknown): yup.SchemaOf<string | string[]> {
+function mkImportsSchema(fieldValue: unknown): yup.Schema<string | string[]> {
     return typeof fieldValue === "string"
         ? yup.string().required("Please specify the types to import")
         : yup.array(yup.string().required("Please specify a type to import")).required("Please specify the types to import");
 }
 
 const importsSchema = yup.lazy(
-    (value: unknown): yup.SchemaOf<Imports> =>
+    (value: unknown): yup.Schema<Imports> =>
         Object.keys(value && typeof value === "object" ? value : {}).reduce(
-            (acc: yup.SchemaOf<Imports>, field: keyof Imports): yup.SchemaOf<Imports> => {
-                const fieldSchema: Lazy<yup.AnySchema> = yup.lazy(mkImportsSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
+            (acc: yup.ObjectSchema<Imports>, field: keyof Imports): yup.ObjectSchema<Imports> => {
+                const fieldSchema: yup.Lazy<object, yup.AnyObject, ""> = yup.lazy(mkImportsSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
 
                 return acc.shape({
                     [field]: fieldSchema as unknown as yup.AnySchema,
                 });
             },
-            yup.object({}) as yup.SchemaOf<Imports>
+            yup.object({}) as yup.ObjectSchema<Imports>
         )
 );
 
@@ -232,7 +231,7 @@ export interface ReduxFile {
     options: ReduxOptions;
 }
 
-const reduxFileSchema: yup.SchemaOf<ParsedReduxFile> = yup
+const reduxFileSchema: yup.ObjectSchema<ParsedReduxFile> = yup
     .object({
         imports: yup.object({
             actions: importsSchema as unknown as yup.AnyObjectSchema,
@@ -250,7 +249,7 @@ interface ParsedReduxFileWithIncludes extends ParsedReduxFile {
     include?: (string | IncludeWithOptions)[];
 }
 
-const reduxFileWithIncludesSchema: yup.SchemaOf<ParsedReduxFileWithIncludes> = reduxFileSchema.clone().shape({
+const reduxFileWithIncludesSchema: yup.Schema<ParsedReduxFileWithIncludes> = reduxFileSchema.clone().shape({
     include: includeSchema as unknown as yup.AnyObjectSchema,
 });
 
