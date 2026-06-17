@@ -21,7 +21,6 @@
     "removeComments": true,                   /* Do not emit comments to output. */
     "noEmit": false,                          /* Do not emit outputs. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
-    "downlevelIteration": true,               /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
     // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
 
     /* Strict Type-Checking Options */
@@ -53,6 +52,7 @@
     // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
     // "allowUmdGlobalAccess": true,          /* Allow accessing UMD globals from modules. */
     "resolveJsonModule": true,
+    "types": ["node"],
 
     /* Source Map Options */
     "sourceRoot": "./src/",                   /* Specify the location where debugger should locate TypeScript files instead of source locations. */

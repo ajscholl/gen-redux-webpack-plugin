@@ -252,7 +252,7 @@ export function mapDispatchToProps(dispatch: Dispatch): TodoAppDispatchProps {
 
 export function connectTodoApp<C extends ComponentType<Matching<TodoAppStateProps & TodoAppDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<C, DistributiveOmit<GetProps<C>, Extract<keyof (TodoAppStateProps & TodoAppDispatchProps), keyof GetProps<C>>>> {
+): ConnectedComponent<C, DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<TodoAppStateProps & TodoAppDispatchProps, GetLibraryManagedProps<C>>>> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }
 

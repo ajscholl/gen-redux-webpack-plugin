@@ -431,64 +431,50 @@ export function genReducer(
         lines.push(genMapDispatchToProps(prefix, group, actions, maxLineLength));
         lines.push("");
         if (reactEnabled) {
-            const cType = `C extends ComponentType<Matching<${makeName(prefix, ...group, "StateProps")} & ${makeName(
-                prefix,
-                ...group,
-                "DispatchProps"
-            )}, GetProps<C>>>,`;
-            const ownType = "TOwnProps";
-            const connectSignature = `export function connect${makeName(prefix, ...group)}<${cType} ${ownType}>(`;
+            const connectFnName = `connect${makeName(prefix, ...group)}`;
+            const mapStateToPropsName = `map${makeName(...group)}StateToProps`;
+            const mapDispatchToPropsName = `map${makeName(...group)}DispatchToProps`;
+            const propsName = `${makeName(prefix, ...group, "StateProps")} & ${makeName(prefix, ...group, "DispatchProps")}`;
+            const cType = `C extends ComponentType<Matching<${propsName}, GetProps<C>>>`;
+            const returnType = `ConnectedComponent<C, DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<${propsName}, GetLibraryManagedProps<C>>>>`;
+            const connectSignature = `export function ${connectFnName}<${cType}>(`;
             if (connectSignature.length > maxLineLength) {
                 if (cType.length + 4 > maxLineLength) {
-                    const matchingLine = `        Matching<${makeName(prefix, ...group, "StateProps")} & ${makeName(
-                        prefix,
-                        ...group,
-                        "DispatchProps"
-                    )}, GetProps<C>>`;
-                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    C extends ComponentType<`);
+                    const matchingLine = `        Matching<${propsName}, GetProps<C>>`;
+                    lines.push(`export function ${connectFnName}<`, `    C extends ComponentType<`);
                     if (matchingLine.length > maxLineLength) {
                         lines.push(
                             `        Matching<`,
-                            `            ${makeName(prefix, ...group, "StateProps")} & ${makeName(prefix, ...group, "DispatchProps")},`,
+                            `            ${propsName},`,
                             `            GetProps<C>`,
                             `        >`
                         );
                     } else {
                         lines.push(matchingLine);
                     }
-                    lines.push(`    >,`, `    ${ownType},`, `>(`);
+                    lines.push(`    >,`, `>(`);
                 } else {
-                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    ${cType}`, `    ${ownType},`, `>(`);
+                    lines.push(`export function ${connectFnName}<`, `    ${cType},`, `>(`);
                 }
             } else {
                 lines.push(connectSignature);
             }
             lines.push("    component: C");
-            const propsStart = `DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<${makeName(prefix, ...group, "StateProps")} & ${makeName(
-                prefix,
-                ...group,
-                "DispatchProps"
-            )}, GetLibraryManagedProps<C>>> &`;
-            const propsEnd = "TOwnProps";
-            const connectedComponentLine = `): ConnectedComponent<C, ${propsStart} ${propsEnd}> {`;
+            const propsStart = `DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<${propsName}, GetLibraryManagedProps<C>>>`;
+            const connectedComponentLine = `): ${returnType} {`;
             if (connectedComponentLine.length > maxLineLength) {
                 lines.push(`): ConnectedComponent<`, `    C,`);
-                const propsLine = `    ${propsStart} ${propsEnd}`;
+                const propsLine = `    ${propsStart}`;
                 if (propsLine.length > maxLineLength) {
                     if (propsStart.length + 4 > maxLineLength) {
                         lines.push(
                             `    DistributiveOmit<`,
                             `        GetLibraryManagedProps<C>,`,
-                            `        keyof Shared<${makeName(prefix, ...group, "StateProps")} & ${makeName(
-                                prefix,
-                                ...group,
-                                "DispatchProps"
-                            )}, GetLibraryManagedProps<C>>`,
-                            `    > &`,
-                            `        ${propsEnd}`
+                            `        keyof Shared<${propsName}, GetLibraryManagedProps<C>>`,
+                            `    >`
                         );
                     } else {
-                        lines.push(`    ${propsStart}`, `        ${propsEnd}`);
+                        lines.push(propsLine);
                     }
                 } else {
                     lines.push(propsLine);
@@ -497,7 +483,7 @@ export function genReducer(
             } else {
                 lines.push(connectedComponentLine);
             }
-            lines.push(`    return connect(map${makeName(...group)}StateToProps, map${makeName(...group)}DispatchToProps)(component);`, "}", "");
+            lines.push(`    return connect(${mapStateToPropsName}, ${mapDispatchToPropsName})(component);`, "}", "");
         }
     }
 
@@ -623,7 +609,7 @@ function genMapDispatchToProps(prefix: string, group: string[], actions: ReduxAc
     }
     lines.push("}");
     lines.push("");
-    lines.push(`export function map${makeName(...group)}DispatchToProps(dispatch: Dispatch): ${makeName(prefix, ...group, "DispatchProps")} {`);
+    lines.push(`export function map${makeName(...group)}DispatchToProps(dispatch: Dispatch<string>): ${makeName(prefix, ...group, "DispatchProps")} {`);
     lines.push("    return {");
     for (const action of Object.values(actions)) {
         if (isGroupEqual(action.group, group)) {

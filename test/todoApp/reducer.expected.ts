@@ -64,7 +64,7 @@ export interface TodoAppDispatchProps {
     clearTodos(): void;
 }
 
-export function mapDispatchToProps(dispatch: Dispatch): TodoAppDispatchProps {
+export function mapDispatchToProps(dispatch: Dispatch<string>): TodoAppDispatchProps {
     return {
         addTodo: (todo: Todo): void => dispatch(todoAppAddTodoAction(todo)),
         addTwoTodos: (firstTodo: Todo, secondTodo: Todo): void => dispatch(todoAppAddTwoTodosAction(firstTodo, secondTodo)),
@@ -74,11 +74,8 @@ export function mapDispatchToProps(dispatch: Dispatch): TodoAppDispatchProps {
     };
 }
 
-export function connectTodoApp<C extends ComponentType<Matching<TodoAppStateProps & TodoAppDispatchProps, GetProps<C>>>, TOwnProps>(
+export function connectTodoApp<C extends ComponentType<Matching<TodoAppStateProps & TodoAppDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<
-    C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<TodoAppStateProps & TodoAppDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
-> {
+): ConnectedComponent<C, DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<TodoAppStateProps & TodoAppDispatchProps, GetLibraryManagedProps<C>>>> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }

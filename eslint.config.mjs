@@ -1,31 +1,24 @@
 import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import prettierPlugin from "eslint-plugin-prettier";
+import prettierConfig from "eslint-config-prettier";
 
 export default [{
     ignores: ["**/dist/"],
-}, ...compat.extends(
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:prettier/recommended",
-), {
+}, {
+    plugins: {
+        "@typescript-eslint": tsPlugin,
+        prettier: prettierPlugin,
+    },
     languageOptions: {
         parser: tsParser,
         ecmaVersion: 2020,
         sourceType: "module",
     },
-
     rules: {
+        ...tsPlugin.configs.recommended.rules,
+        ...prettierConfig.rules,
+        ...prettierPlugin.configs.recommended.rules,
         "sort-imports": ["error", {
             ignoreCase: false,
             ignoreDeclarationSort: false,
@@ -33,7 +26,6 @@ export default [{
             memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
             allowSeparatedGroups: false,
         }],
-
         "linebreak-style": ["error", "unix"],
     },
 }];

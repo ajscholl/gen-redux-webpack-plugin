@@ -3,7 +3,8 @@
     "compilerOptions": {
         "noEmit": true,
         "rootDir": "./",
-        "jsx": "react"
+        "jsx": "react",
+        "types": ["node", "jest"]
     },
     "include": [
         "src",

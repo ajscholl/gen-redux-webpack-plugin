@@ -38,17 +38,17 @@ export interface HiddenStateDispatchProps {
     increaseCount(): void;
 }
 
-export function mapDispatchToProps(dispatch: Dispatch): HiddenStateDispatchProps {
+export function mapDispatchToProps(dispatch: Dispatch<string>): HiddenStateDispatchProps {
     return {
         increaseCount: (): void => dispatch(hiddenStateIncreaseCountAction()),
     };
 }
 
-export function connectHiddenState<C extends ComponentType<Matching<HiddenStateStateProps & HiddenStateDispatchProps, GetProps<C>>>, TOwnProps>(
+export function connectHiddenState<C extends ComponentType<Matching<HiddenStateStateProps & HiddenStateDispatchProps, GetProps<C>>>>(
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<HiddenStateStateProps & HiddenStateDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<HiddenStateStateProps & HiddenStateDispatchProps, GetLibraryManagedProps<C>>>
 > {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }

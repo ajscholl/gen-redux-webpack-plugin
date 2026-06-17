@@ -1,4 +1,3 @@
-import * as chokidar from "chokidar";
 import { basename, dirname } from "path";
 import { Processor } from ".";
 
@@ -11,9 +10,9 @@ export default class Watcher {
 
     public async run(files: string[]): Promise<void> {
         await this.processor.processFiles(files);
-        chokidar
+        const chokidar = await import("chokidar");
+        chokidar.default
             .watch(files, {
-                disableGlobbing: true,
                 awaitWriteFinish: {
                     stabilityThreshold: 300,
                 },
@@ -21,7 +20,7 @@ export default class Watcher {
             .on("all", this.onChange);
     }
 
-    private onChange = async (eventName: "add" | "addDir" | "change" | "unlink" | "unlinkDir", file: string): Promise<void> => {
+    private onChange = async (eventName: string, file: string): Promise<void> => {
         switch (eventName) {
             case "add":
             case "addDir":

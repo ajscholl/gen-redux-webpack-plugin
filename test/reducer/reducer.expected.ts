@@ -75,7 +75,7 @@ export interface ReducerDispatchProps {
     otherAction(field: number): void;
 }
 
-export function mapDispatchToProps(dispatch: Dispatch): ReducerDispatchProps {
+export function mapDispatchToProps(dispatch: Dispatch<string>): ReducerDispatchProps {
     return {
         setPage: (page: PageNumber): void => dispatch(reducerSetPageAction(page)),
         clearPage: (): void => dispatch(reducerClearPageAction()),

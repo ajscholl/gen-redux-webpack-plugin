@@ -348,7 +348,7 @@ export interface CombinedDispatchProps {
     yamlSetDefault(newDefault: DefaultObject): void;
 }
 
-export function mapDispatchToProps(dispatch: Dispatch): CombinedDispatchProps {
+export function mapDispatchToProps(dispatch: Dispatch<string>): CombinedDispatchProps {
     return {
         complexSetCallback: (callback: () => void): void => dispatch(combinedComplexSetCallbackAction(callback)),
         complexSetMultiple: (choice: number | string): void => dispatch(combinedComplexSetMultipleAction(choice)),
@@ -377,12 +377,9 @@ export function mapDispatchToProps(dispatch: Dispatch): CombinedDispatchProps {
     };
 }
 
-export function connectCombined<C extends ComponentType<Matching<CombinedStateProps & CombinedDispatchProps, GetProps<C>>>, TOwnProps>(
+export function connectCombined<C extends ComponentType<Matching<CombinedStateProps & CombinedDispatchProps, GetProps<C>>>>(
     component: C
-): ConnectedComponent<
-    C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedStateProps & CombinedDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
-> {
+): ConnectedComponent<C, DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedStateProps & CombinedDispatchProps, GetLibraryManagedProps<C>>>> {
     return connect(mapStateToProps, mapDispatchToProps)(component);
 }
 
@@ -400,21 +397,17 @@ export interface CombinedHiddenStateDispatchProps {
     hiddenStateIncreaseCount(): void;
 }
 
-export function mapHiddenStateDispatchToProps(dispatch: Dispatch): CombinedHiddenStateDispatchProps {
+export function mapHiddenStateDispatchToProps(dispatch: Dispatch<string>): CombinedHiddenStateDispatchProps {
     return {
         hiddenStateIncreaseCount: (): void => dispatch(hiddenState__CombinedHiddenStateIncreaseCountAction()),
     };
 }
 
-export function connectCombinedHiddenState<
-    C extends ComponentType<Matching<CombinedHiddenStateStateProps & CombinedHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps,
->(
+export function connectCombinedHiddenState<C extends ComponentType<Matching<CombinedHiddenStateStateProps & CombinedHiddenStateDispatchProps, GetProps<C>>>>(
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedHiddenStateStateProps & CombinedHiddenStateDispatchProps, GetLibraryManagedProps<C>>> &
-        TOwnProps
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedHiddenStateStateProps & CombinedHiddenStateDispatchProps, GetLibraryManagedProps<C>>>
 > {
     return connect(mapHiddenStateStateToProps, mapHiddenStateDispatchToProps)(component);
 }
@@ -437,7 +430,7 @@ export interface CombinedIncludedDispatchProps {
     includeClearTodos(): void;
 }
 
-export function mapIncludedDispatchToProps(dispatch: Dispatch): CombinedIncludedDispatchProps {
+export function mapIncludedDispatchToProps(dispatch: Dispatch<string>): CombinedIncludedDispatchProps {
     return {
         includeAddTodo: (todo: Todo): void => dispatch(included__CombinedIncludeAddTodoAction(todo)),
         includeAddTwoTodos: (firstTodo: Todo, secondTodo: Todo): void => dispatch(included__CombinedIncludeAddTwoTodosAction(firstTodo, secondTodo)),
@@ -447,11 +440,11 @@ export function mapIncludedDispatchToProps(dispatch: Dispatch): CombinedIncluded
     };
 }
 
-export function connectCombinedIncluded<C extends ComponentType<Matching<CombinedIncludedStateProps & CombinedIncludedDispatchProps, GetProps<C>>>, TOwnProps>(
+export function connectCombinedIncluded<C extends ComponentType<Matching<CombinedIncludedStateProps & CombinedIncludedDispatchProps, GetProps<C>>>>(
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedIncludedStateProps & CombinedIncludedDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedIncludedStateProps & CombinedIncludedDispatchProps, GetLibraryManagedProps<C>>>
 > {
     return connect(mapIncludedStateToProps, mapIncludedDispatchToProps)(component);
 }
@@ -470,7 +463,7 @@ export interface CombinedIncludedALastHiddenStateDispatchProps {
     includeIncreaseCount(): void;
 }
 
-export function mapIncludedALastHiddenStateDispatchToProps(dispatch: Dispatch): CombinedIncludedALastHiddenStateDispatchProps {
+export function mapIncludedALastHiddenStateDispatchToProps(dispatch: Dispatch<string>): CombinedIncludedALastHiddenStateDispatchProps {
     return {
         includeIncreaseCount: (): void => dispatch(included_ALastHiddenState__CombinedIncludeIncreaseCountAction()),
     };
@@ -478,7 +471,6 @@ export function mapIncludedALastHiddenStateDispatchToProps(dispatch: Dispatch): 
 
 export function connectCombinedIncludedALastHiddenState<
     C extends ComponentType<Matching<CombinedIncludedALastHiddenStateStateProps & CombinedIncludedALastHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -486,8 +478,7 @@ export function connectCombinedIncludedALastHiddenState<
     DistributiveOmit<
         GetLibraryManagedProps<C>,
         keyof Shared<CombinedIncludedALastHiddenStateStateProps & CombinedIncludedALastHiddenStateDispatchProps, GetLibraryManagedProps<C>>
-    > &
-        TOwnProps
+    >
 > {
     return connect(mapIncludedALastHiddenStateStateToProps, mapIncludedALastHiddenStateDispatchToProps)(component);
 }
@@ -506,7 +497,7 @@ export interface CombinedIncludedAnotherHiddenStateDispatchProps {
     includeIncreaseCount(): void;
 }
 
-export function mapIncludedAnotherHiddenStateDispatchToProps(dispatch: Dispatch): CombinedIncludedAnotherHiddenStateDispatchProps {
+export function mapIncludedAnotherHiddenStateDispatchToProps(dispatch: Dispatch<string>): CombinedIncludedAnotherHiddenStateDispatchProps {
     return {
         includeIncreaseCount: (): void => dispatch(included_AnotherHiddenState__CombinedIncludeIncreaseCountAction()),
     };
@@ -514,7 +505,6 @@ export function mapIncludedAnotherHiddenStateDispatchToProps(dispatch: Dispatch)
 
 export function connectCombinedIncludedAnotherHiddenState<
     C extends ComponentType<Matching<CombinedIncludedAnotherHiddenStateStateProps & CombinedIncludedAnotherHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -522,8 +512,7 @@ export function connectCombinedIncludedAnotherHiddenState<
     DistributiveOmit<
         GetLibraryManagedProps<C>,
         keyof Shared<CombinedIncludedAnotherHiddenStateStateProps & CombinedIncludedAnotherHiddenStateDispatchProps, GetLibraryManagedProps<C>>
-    > &
-        TOwnProps
+    >
 > {
     return connect(mapIncludedAnotherHiddenStateStateToProps, mapIncludedAnotherHiddenStateDispatchToProps)(component);
 }
@@ -542,7 +531,7 @@ export interface CombinedIncludedHiddenStateDispatchProps {
     includeHiddenStateIncreaseCount(): void;
 }
 
-export function mapIncludedHiddenStateDispatchToProps(dispatch: Dispatch): CombinedIncludedHiddenStateDispatchProps {
+export function mapIncludedHiddenStateDispatchToProps(dispatch: Dispatch<string>): CombinedIncludedHiddenStateDispatchProps {
     return {
         includeHiddenStateIncreaseCount: (): void => dispatch(included_HiddenState__CombinedIncludeHiddenStateIncreaseCountAction()),
     };
@@ -550,7 +539,6 @@ export function mapIncludedHiddenStateDispatchToProps(dispatch: Dispatch): Combi
 
 export function connectCombinedIncludedHiddenState<
     C extends ComponentType<Matching<CombinedIncludedHiddenStateStateProps & CombinedIncludedHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -558,8 +546,7 @@ export function connectCombinedIncludedHiddenState<
     DistributiveOmit<
         GetLibraryManagedProps<C>,
         keyof Shared<CombinedIncludedHiddenStateStateProps & CombinedIncludedHiddenStateDispatchProps, GetLibraryManagedProps<C>>
-    > &
-        TOwnProps
+    >
 > {
     return connect(mapIncludedHiddenStateStateToProps, mapIncludedHiddenStateDispatchToProps)(component);
 }
@@ -578,17 +565,14 @@ export interface CombinedIncludedIndirectHiddenStateNestedDispatchProps {
     includeIncreaseCount(): void;
 }
 
-export function mapIncludedIndirectHiddenStateNestedDispatchToProps(dispatch: Dispatch): CombinedIncludedIndirectHiddenStateNestedDispatchProps {
+export function mapIncludedIndirectHiddenStateNestedDispatchToProps(dispatch: Dispatch<string>): CombinedIncludedIndirectHiddenStateNestedDispatchProps {
     return {
         includeIncreaseCount: (): void => dispatch(included_IndirectHiddenState_Nested__CombinedIncludeIncreaseCountAction()),
     };
 }
 
 export function connectCombinedIncludedIndirectHiddenStateNested<
-    C extends ComponentType<
-        Matching<CombinedIncludedIndirectHiddenStateNestedStateProps & CombinedIncludedIndirectHiddenStateNestedDispatchProps, GetProps<C>>
-    >,
-    TOwnProps,
+    C extends ComponentType<Matching<CombinedIncludedIndirectHiddenStateNestedStateProps & CombinedIncludedIndirectHiddenStateNestedDispatchProps, GetProps<C>>>,
 >(
     component: C
 ): ConnectedComponent<
@@ -596,8 +580,7 @@ export function connectCombinedIncludedIndirectHiddenStateNested<
     DistributiveOmit<
         GetLibraryManagedProps<C>,
         keyof Shared<CombinedIncludedIndirectHiddenStateNestedStateProps & CombinedIncludedIndirectHiddenStateNestedDispatchProps, GetLibraryManagedProps<C>>
-    > &
-        TOwnProps
+    >
 > {
     return connect(mapIncludedIndirectHiddenStateNestedStateToProps, mapIncludedIndirectHiddenStateNestedDispatchToProps)(component);
 }
@@ -624,7 +607,7 @@ export interface CombinedReducerDispatchProps {
     reducerOtherAction(field: number): void;
 }
 
-export function mapReducerDispatchToProps(dispatch: Dispatch): CombinedReducerDispatchProps {
+export function mapReducerDispatchToProps(dispatch: Dispatch<string>): CombinedReducerDispatchProps {
     return {
         reducerSetPage: (page: PageNumber): void => dispatch(reducer__CombinedReducerSetPageAction(page)),
         reducerClearPage: (): void => dispatch(reducer__CombinedReducerClearPageAction()),
@@ -636,11 +619,11 @@ export function mapReducerDispatchToProps(dispatch: Dispatch): CombinedReducerDi
     };
 }
 
-export function connectCombinedReducer<C extends ComponentType<Matching<CombinedReducerStateProps & CombinedReducerDispatchProps, GetProps<C>>>, TOwnProps>(
+export function connectCombinedReducer<C extends ComponentType<Matching<CombinedReducerStateProps & CombinedReducerDispatchProps, GetProps<C>>>>(
     component: C
 ): ConnectedComponent<
     C,
-    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedReducerStateProps & CombinedReducerDispatchProps, GetLibraryManagedProps<C>>> & TOwnProps
+    DistributiveOmit<GetLibraryManagedProps<C>, keyof Shared<CombinedReducerStateProps & CombinedReducerDispatchProps, GetLibraryManagedProps<C>>>
 > {
     return connect(mapReducerStateToProps, mapReducerDispatchToProps)(component);
 }
