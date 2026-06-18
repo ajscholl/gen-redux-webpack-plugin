@@ -456,9 +456,9 @@ export function genReducer(
                     } else {
                         lines.push(matchingLine);
                     }
-                    lines.push(`    >,`, `    ${ownType}`, `>(`);
+                    lines.push(`    >,`, `    ${ownType},`, `>(`);
                 } else {
-                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    ${cType}`, `    ${ownType}`, `>(`);
+                    lines.push(`export function connect${makeName(prefix, ...group)}<`, `    ${cType}`, `    ${ownType},`, `>(`);
                 }
             } else {
                 lines.push(connectSignature);

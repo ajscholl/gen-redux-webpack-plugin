@@ -156,13 +156,16 @@ function mkImportsSchema(fieldValue: unknown): yup.SchemaOf<string | string[]> {
 
 const importsSchema = yup.lazy(
     (value: unknown): yup.SchemaOf<Imports> =>
-        Object.keys(value && typeof value === "object" ? value : {}).reduce((acc: yup.SchemaOf<Imports>, field: keyof Imports): yup.SchemaOf<Imports> => {
-            const fieldSchema: Lazy<yup.AnySchema> = yup.lazy(mkImportsSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
+        Object.keys(value && typeof value === "object" ? value : {}).reduce(
+            (acc: yup.SchemaOf<Imports>, field: keyof Imports): yup.SchemaOf<Imports> => {
+                const fieldSchema: Lazy<yup.AnySchema> = yup.lazy(mkImportsSchema as unknown as (fieldValue: unknown) => yup.AnySchema);
 
-            return acc.shape({
-                [field]: fieldSchema as unknown as yup.AnySchema,
-            });
-        }, yup.object({}) as yup.SchemaOf<Imports>)
+                return acc.shape({
+                    [field]: fieldSchema as unknown as yup.AnySchema,
+                });
+            },
+            yup.object({}) as yup.SchemaOf<Imports>
+        )
 );
 
 export interface ReduxOptions {

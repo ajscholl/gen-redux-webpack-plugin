@@ -191,7 +191,7 @@ export function mapALastHiddenStateDispatchToProps(dispatch: Dispatch): IncludeA
 
 export function connectIncludeALastHiddenState<
     C extends ComponentType<Matching<IncludeALastHiddenStateStateProps & IncludeALastHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps
+    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -227,7 +227,7 @@ export function mapAnotherHiddenStateDispatchToProps(dispatch: Dispatch): Includ
 
 export function connectIncludeAnotherHiddenState<
     C extends ComponentType<Matching<IncludeAnotherHiddenStateStateProps & IncludeAnotherHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps
+    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -263,7 +263,7 @@ export function mapHiddenStateDispatchToProps(dispatch: Dispatch): IncludeHidden
 
 export function connectIncludeHiddenState<
     C extends ComponentType<Matching<IncludeHiddenStateStateProps & IncludeHiddenStateDispatchProps, GetProps<C>>>,
-    TOwnProps
+    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
@@ -296,7 +296,7 @@ export function mapIndirectHiddenStateNestedDispatchToProps(dispatch: Dispatch):
 
 export function connectIncludeIndirectHiddenStateNested<
     C extends ComponentType<Matching<IncludeIndirectHiddenStateNestedStateProps & IncludeIndirectHiddenStateNestedDispatchProps, GetProps<C>>>,
-    TOwnProps
+    TOwnProps,
 >(
     component: C
 ): ConnectedComponent<
